@@ -5,15 +5,24 @@ on:
     - cron: '0 * * * *' # Runs every hour
   workflow_dispatch: {}
 
+concurrency:
+  group: '${{ github.workflow }}'
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+defaults:
+  run:
+    shell: 'bash'
+
 jobs:
   triage-issues:
     timeout-minutes: 10
     if: ${{ github.repository == 'google-gemini/gemini-cli' }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-      issues: write
     steps:
       - name: Generate GitHub App Token
         id: generate_token
@@ -189,3 +198,109 @@ jobs:
               - could also pertain to latency,
               - other general software performance like, memory usage, CPU consumption, and algorithmic efficiency.
               - Switching models from one to the other unexpectedly.
+  refresh-embeddings:
+    timeout-minutes: 20
+    if: ${{ vars.TRIAGE_DEDUPLICATE_ISSUES != '' && github.repository == 'google-gemini/gemini-cli' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@140bb5113ffb6b65a7e9b937a81fa96cf5064462' # ratchet:google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ vars.FIRESTORE_WIF_PROVIDER }}'
+          service_account: '${{ vars.FIRESTORE_SA_EMAIL }}'
+
+      - name: 'Login to GAR'
+        uses: 'docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772' # ratchet:docker/login-action@v3
+        with:
+          registry: 'northamerica-northeast1-docker.pkg.dev'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+
+      - name: 'Run Gemini Issue Deduplication Refresh'
+        uses: google-gemini/gemini-cli-action@df3f890f003d28c60a2a09d2c29e0126e4d1e2ff
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        with:
+          version: 0.1.8-rc.0
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ISSUE_NUMBER: '${{ github.event.issue.number }}'
+          FIRESTORE_GOOGLE_CLOUD_PROJECT: '${{ vars.FIRESTORE_GOOGLE_CLOUD_PROJECT }}'
+          FIRESTORE_GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+
+          OTLP_GCP_WIF_PROVIDER: ${{ secrets.OTLP_GCP_WIF_PROVIDER }}
+          OTLP_GOOGLE_CLOUD_PROJECT: ${{ secrets.OTLP_GOOGLE_CLOUD_PROJECT }}
+          settings_json: |-
+            {
+              "mcpServers": {
+                "issue_deduplication": {
+                  "command": "docker",
+                  "args": [
+                    "run",
+                    "-i",
+                    "--rm",
+                    "--network=host",
+                    "-e",
+                    "GITHUB_TOKEN",
+                    "-e",
+                    "GEMINI_API_KEY",
+                    "-e",
+                    "DATABASE_TYPE",
+                    "-e",
+                    "FIRESTORE_DATABASE_ID",
+                    "-e",
+                    "GCP_PROJECT",
+                    "-e",
+                    "GOOGLE_APPLICATION_CREDENTIALS",
+                    "-v",
+                    "${GOOGLE_APPLICATION_CREDENTIALS}:${GOOGLE_APPLICATION_CREDENTIALS}",
+                    "northamerica-northeast1-docker.pkg.dev/quacktastic-waffle/run-gemini-cli/issues-dedup-mcp-server:latest"
+                  ],
+                  "env": {
+                    "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+                    "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+                    "DATABASE_TYPE":"firestore",
+                    "GCP_PROJECT": "${FIRESTORE_GOOGLE_CLOUD_PROJECT}",
+                    "FIRESTORE_DATABASE_ID": "(default)",
+                    "GOOGLE_APPLICATION_CREDENTIALS": "${FIRESTORE_GOOGLE_APPLICATION_CREDENTIALS}"
+                  },
+                  "enabled": true
+                }
+              },
+              "coreTools": [
+                "run_shell_command(echo)",
+              ],
+              "telemetry": {
+                "enabled": true,
+                "target": "gcp"
+              },
+              "sandbox": false
+            }
+          prompt: |-
+            ## Role
+
+            You are a database maintenance assistant for a GitHub issue deduplication system.
+
+            ## Goal
+
+            Your sole responsibility is to refresh the embeddings for all open issues in the repository to ensure the deduplication database is up-to-date.
+
+            ## Steps
+
+            1.  **Extract Repository Information:** The repository is ${{ github.repository }}.
+            2.  **Refresh Embeddings:** Call the `refresh` tool with the correct `repo`. Do not use the `force` parameter.
+            3.  **Log Output:** Print the JSON output from the `refresh` tool to the logs.
+
+            ## Guidelines
+
+            - Only use the `refresh` tool.
+            - Do not attempt to find duplicates or modify any issues.
+            - Your only task is to call the `refresh` tool and log its output.

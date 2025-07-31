@@ -4,17 +4,23 @@ on:
   issues:
     types: [opened, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  issues: write
+  contents: read
+  id-token: write
+
+defaults:
+  run:
+    shell: 'bash'
+
 jobs:
   triage-issue:
     timeout-minutes: 5
     if: ${{ github.repository == 'google-gemini/gemini-cli' }}
-    permissions:
-      issues: write
-      contents: read
-      id-token: write
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.event.issue.number }}
-      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App Token
@@ -141,3 +147,154 @@ jobs:
             - could also pertain to latency,
             - other general software performance like, memory usage, CPU consumption, and algorithmic efficiency.
             - Switching models from one to the other unexpectedly.
+  dedup-issues:
+    timeout-minutes: 10
+    if: ${{ vars.TRIAGE_DEDUPLICATE_ISSUES != '' && github.repository == 'google-gemini/gemini-cli' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@140bb5113ffb6b65a7e9b937a81fa96cf5064462' # ratchet:google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ vars.FIRESTORE_WIF_PROVIDER }}'
+          service_account: '${{ vars.FIRESTORE_SA_EMAIL }}'
+
+      - name: 'Login to GAR'
+        uses: 'docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772' # ratchet:docker/login-action@v3
+        with:
+          registry: 'northamerica-northeast1-docker.pkg.dev'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+
+      - name: Run Gemini Issue Deduplication
+        uses: google-gemini/gemini-cli-action@df3f890f003d28c60a2a09d2c29e0126e4d1e2ff
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        with:
+          version: 0.1.8-rc.0
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ISSUE_NUMBER: '${{ github.event.issue.number }}'
+          FIRESTORE_GOOGLE_CLOUD_PROJECT: '${{ vars.FIRESTORE_GOOGLE_CLOUD_PROJECT }}'
+          FIRESTORE_GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+
+          OTLP_GCP_WIF_PROVIDER: ${{ secrets.OTLP_GCP_WIF_PROVIDER }}
+          OTLP_GOOGLE_CLOUD_PROJECT: ${{ secrets.OTLP_GOOGLE_CLOUD_PROJECT }}
+          settings_json: |-
+            {
+              "mcpServers": {
+                "issue_deduplication": {
+                  "command": "docker",
+                  "args": [
+                    "run",
+                    "-i",
+                    "--rm",
+                    "--network=host",
+                    "-e",
+                    "GITHUB_TOKEN",
+                    "-e",
+                    "GEMINI_API_KEY",
+                    "-e",
+                    "DATABASE_TYPE",
+                    "-e",
+                    "FIRESTORE_DATABASE_ID",
+                    "-e",
+                    "GCP_PROJECT",
+                    "-e",
+                    "GOOGLE_APPLICATION_CREDENTIALS",
+                    "-v",
+                    "${GOOGLE_APPLICATION_CREDENTIALS}:${GOOGLE_APPLICATION_CREDENTIALS}",
+                    "northamerica-northeast1-docker.pkg.dev/quacktastic-waffle/run-gemini-cli/issues-dedup-mcp-server:latest"
+                  ],
+                  "env": {
+                    "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+                    "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+                    "DATABASE_TYPE":"firestore",
+                    "GCP_PROJECT": "${FIRESTORE_GOOGLE_CLOUD_PROJECT}",
+                    "FIRESTORE_DATABASE_ID": "(default)",
+                    "GOOGLE_APPLICATION_CREDENTIALS": "${FIRESTORE_GOOGLE_APPLICATION_CREDENTIALS}"
+                  },
+                  "enabled": true
+                }
+              },
+              "coreTools": [
+                "run_shell_command(echo)",
+                "run_shell_command(gh issue comment)",
+                "run_shell_command(gh issue view)",
+                "run_shell_command(gh issue edit)"
+              ],
+              "telemetry": {
+                "enabled": true,
+                "target": "gcp"
+              },
+              "sandbox": false
+            }
+          prompt: |-
+            ## Role
+
+            You are an issue de-duplication assistant. Your goal is to find
+            duplicate issues, label the current issue as a duplicate, and notify
+            the user by commenting on the current issue, while avoiding
+            duplicate comments.
+
+            ## Steps
+
+            1.  **Find Potential Duplicates:**
+                - The repository is ${{ github.repository }} and the issue number is ${{ github.event.issue.number }}.
+                - Use the `duplicates` tool with the `repo` and `issue_number` to find potential duplicates for the current issue. Do not use the `threshold` parameter.
+                - If no duplicates are found, you are done.
+                - Print the JSON output from the `duplicates` tool to the logs.
+
+            2.  **Refine Duplicates List (if necessary):**
+                - If the `duplicates` tool returns between 1 and 14 results, you must refine the list.
+                - For each potential duplicate issue, run `gh issue view <issue-number> --json title,body,comments` to fetch its content.
+                - Also fetch the content of the original issue: `gh issue view "${ISSUE_NUMBER}" --json title,body,comments`.
+                - Carefully analyze the content (title, body, comments) of the original issue and all potential duplicates.
+                - It is very important if the comments on either issue mention that they are not duplicates of each other, to treat them as not duplicates.
+                - Based on your analysis, create a final list containing only the issues you are highly confident are actual duplicates.
+                - If your final list is empty, you are done.
+                - Print to the logs if you omitted any potential duplicates based on your analysis.
+                - If the `duplicates` tool returned 15+ results, use the top 15 matches (based on descending similarity score value) to perform this step.
+
+            3.  **Format Final Duplicates List:**
+                Format the final list of duplicates into a markdown string.
+                The format should be:
+                "Found possible duplicate issues:\n\n- #${issue_number}\n\nIf you believe this is not a duplicate, please remove the `status/possible-duplicate` label."
+                Add an HTML comment to the end for identification: `<!-- gemini-cli-deduplication -->`
+
+            4.  **Check for Existing Comment:**
+                - Run `gh issue view "${ISSUE_NUMBER}" --json comments` to get all
+                  comments on the issue.
+                - Look for a comment made by a bot (the author's login often ends in `[bot]`) that contains `<!-- gemini-cli-deduplication -->`.
+                - If you find such a comment, store its `id` and `body`.
+
+            5.  **Decide Action:**
+                - **If an existing comment is found:**
+                    - Compare the new list of duplicate issues with the list from the existing comment's body.
+                    - If they are the same, do nothing.
+                    - If they are different, edit the existing comment. Use
+                      `gh issue comment "${ISSUE_NUMBER}" --edit-comment <comment-id> --body "..."`.
+                      The new body should be the new list of duplicates, but with the header "Found possible duplicate issues (updated):".
+                - **If no existing comment is found:**
+                    - Create a new comment with the list of duplicates.
+                    - Use `gh issue comment "${ISSUE_NUMBER}" --body "..."`.
+
+            6.  **Add Duplicate Label:**
+                - If you created or updated a comment in the previous step, add the `duplicate` label to the current issue.
+                - Use `gh issue edit "${ISSUE_NUMBER}" --add-label "status/possible-duplicate"`.
+
+            ## Guidelines
+
+            - Only use the `duplicates` and `run_shell_command` tools.
+            - The `run_shell_command` tool can be used with `gh issue view`, `gh issue comment`, and `gh issue edit`.
+            - Do not download or read media files like images, videos, or links. The `--json` flag for `gh issue view` will prevent this.
+            - Do not modify the issue content or status.
+            - Only comment on and label the current issue.
+            - Reference all shell variables as "${VAR}" (with quotes and braces)
