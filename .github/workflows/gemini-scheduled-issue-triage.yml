@@ -21,7 +21,7 @@ defaults:
 jobs:
   triage-issues:
     timeout-minutes: 10
-    if: ${{ github.repository == 'google-gemini/gemini-cli' }}
+    if: ${{ github.repository == 'gsquared94/gemini-cli' }}
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App Token
@@ -200,7 +200,7 @@ jobs:
               - Switching models from one to the other unexpectedly.
   refresh-embeddings:
     timeout-minutes: 20
-    if: ${{ vars.TRIAGE_DEDUPLICATE_ISSUES != '' && github.repository == 'google-gemini/gemini-cli' }}
+    if: ${{ vars.TRIAGE_DEDUPLICATE_ISSUES != '' && github.repository == 'gsquared94/gemini-cli' }}
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App Token
