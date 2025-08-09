@@ -32,7 +32,7 @@ permissions:
 jobs:
   triage-issue:
     if: >
-      github.repository == 'google-gemini/gemini-cli' &&
+      github.repository == 'gsquared94/gemini-cli' &&
       (github.event_name == 'issues' ||
        github.event_name == 'workflow_dispatch' ||
        (github.event_name == 'issue_comment' &&
@@ -47,18 +47,11 @@ jobs:
       - name: 'Checkout repository'
         uses: 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683'
 
-      - name: 'Generate GitHub App Token'
-        id: 'generate_token'
-        uses: 'actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e'
-        with:
-          app-id: '${{ secrets.APP_ID }}'
-          private-key: '${{ secrets.PRIVATE_KEY }}'
-
       - name: 'Run Gemini Issue Triage'
         uses: 'google-github-actions/run-gemini-cli@20351b5ea2b4179431f1ae8918a246a0808f8747'
         id: 'gemini_issue_triage'
         env:
-          GITHUB_TOKEN: '${{ steps.generate_token.outputs.token }}'
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           ISSUE_TITLE: '${{ github.event.issue.title }}'
           ISSUE_BODY: '${{ github.event.issue.body }}'
           ISSUE_NUMBER: '${{ github.event.issue.number }}'
@@ -193,7 +186,7 @@ jobs:
           ${{ failure() && steps.gemini_issue_triage.outcome == 'failure' }}
         uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea'
         with:
-          github-token: '${{ steps.generate_token.outputs.token }}'
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
           script: |-
             github.rest.issues.createComment({
               owner: '${{ github.repository }}'.split('/')[0],
@@ -204,7 +197,7 @@ jobs:
 
   deduplicate-issues:
     if: >
-      github.repository == 'google-gemini/gemini-cli' &&
+      github.repository == 'gsquared94/gemini-cli' &&
       vars.TRIAGE_DEDUPLICATE_ISSUES != '' &&
       (github.event_name == 'issues' ||
        github.event_name == 'workflow_dispatch' ||
@@ -220,18 +213,11 @@ jobs:
       - name: 'Checkout repository'
         uses: 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683'
 
-      - name: 'Generate GitHub App Token'
-        id: 'generate_token'
-        uses: 'actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e'
-        with:
-          app-id: '${{ secrets.APP_ID }}'
-          private-key: '${{ secrets.PRIVATE_KEY }}'
-
       - name: 'Run Gemini Issue Deduplication'
         uses: 'google-github-actions/run-gemini-cli@20351b5ea2b4179431f1ae8918a246a0808f8747'
         id: 'gemini_issue_deduplication'
         env:
-          GITHUB_TOKEN: '${{ steps.generate_token.outputs.token }}'
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           ISSUE_TITLE: '${{ github.event.issue.title }}'
           ISSUE_BODY: '${{ github.event.issue.body }}'
           ISSUE_NUMBER: '${{ github.event.issue.number }}'
@@ -268,7 +254,7 @@ jobs:
                     "GOOGLE_APPLICATION_CREDENTIALS",
                     "-v",
                     "${GOOGLE_APPLICATION_CREDENTIALS}:${GOOGLE_APPLICATION_CREDENTIALS}",
-                    "ghcr.io/google-gemini/gemini-cli-issue-triage@sha256:e3de1523f6c83aabb3c54b76d08940a2bf42febcb789dd2da6f95169641f94d3"
+                    "ghcr.io/gsquared94/gemini-cli-issue-triage@sha256:e3de1523f6c83aabb3c54b76d08940a2bf42febcb789dd2da6f95169641f94d3"
                   ],
                   "env": {
                     "GITHUB_TOKEN": "${GITHUB_TOKEN}",
