@@ -296,7 +296,7 @@ jobs:
               },
               "maxSessionTurns": 25,
               "coreTools": [
-                "run_shell_command(echo)",
+                "run_shell_command(echo)"
               ],
               "telemetry": {
                 "enabled": true,
