@@ -240,6 +240,7 @@ jobs:
                     "run",
                     "-i",
                     "--rm",
+                    "--network", "host",
                     "-e", "GITHUB_TOKEN",
                     "-e", "GEMINI_API_KEY",
                     "-e", "DATABASE_TYPE",
