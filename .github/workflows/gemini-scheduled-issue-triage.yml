@@ -226,25 +226,55 @@ jobs:
       - name: 'Checkout repository'
         uses: 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683'
 
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@140bb5113ffb6b65a7e9b937a81fa96cf5064462'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
+          service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+
+      - name: 'Start MCP Server'
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GEMINI_API_KEY: "${{ secrets.GEMINI_API_KEY }}"
+          DATABASE_TYPE: 'firestore'
+          GCP_PROJECT: "${{ vars.FIRESTORE_PROJECT }}"
+          FIRESTORE_DATABASE_ID: '(default)'
+        run: |
+          # This step runs the MCP server in the foreground for debugging.
+          # The workflow will not proceed past this step.
+          # To re-enable the original behavior, revert the changes to this file.
+          docker run -i --rm --network host \
+            -e GITHUB_TOKEN \
+            -e GEMINI_API_KEY \
+            -e DATABASE_TYPE \
+            -e FIRESTORE_DATABASE_ID \
+            -e GCP_PROJECT \
+            -v "${GITHUB_WORKSPACE}:/github/workspace" \
+            -e "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS/$GITHUB_WORKSPACE//github/workspace}" \
+            ghcr.io/gsquared94/gemini-cli-issue-triage:0.0.1
+
       - name: 'Run Gemini Issue Deduplication Refresh'
+        if: false # Disabled for debugging
         uses: 'google-github-actions/run-gemini-cli@20351b5ea2b4179431f1ae8918a246a0808f8747'
         id: 'gemini_refresh_embeddings'
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          ISSUE_TITLE: '${{ github.event.issue.title }}'
-          ISSUE_BODY: '${{ github.event.issue.body }}'
-          ISSUE_NUMBER: '${{ github.event.issue.number }}'
-          REPOSITORY: '${{ github.repository }}'
-          FIRESTORE_PROJECT: '${{ vars.FIRESTORE_PROJECT }}'
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          ISSUE_TITLE: "${{ github.event.issue.title }}"
+          ISSUE_BODY: "${{ github.event.issue.body }}"
+          ISSUE_NUMBER: "${{ github.event.issue.number }}"
+          REPOSITORY: "${{ github.repository }}"
+          FIRESTORE_PROJECT: "${{ vars.FIRESTORE_PROJECT }}"
         with:
-          gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
-          gcp_project_id: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
-          gcp_location: '${{ vars.GOOGLE_CLOUD_LOCATION }}'
-          gcp_service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
-          gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
-          use_vertex_ai: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
-          use_gemini_code_assist: '${{ vars.GOOGLE_GENAI_USE_GCA }}'
-          settings: |-
+          gcp_workload_identity_provider: "${{ vars.GCP_WIF_PROVIDER }}"
+          gcp_project_id: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
+          gcp_location: "${{ vars.GOOGLE_CLOUD_LOCATION }}"
+          gcp_service_account: "${{ vars.SERVICE_ACCOUNT_EMAIL }}"
+          gemini_api_key: "${{ secrets.GEMINI_API_KEY }}"
+          use_vertex_ai: "${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}"
+          use_gemini_code_assist: "${{ vars.GOOGLE_GENAI_USE_GCA }}"
+          settings: |
             {
               "mcpServers": {
                 "issue_deduplication": {
@@ -283,7 +313,7 @@ jobs:
                 "target": "gcp"
               }
             }
-          prompt: |-
+          prompt: |
             ## Role
 
             You are a database maintenance assistant for a GitHub issue deduplication system.
