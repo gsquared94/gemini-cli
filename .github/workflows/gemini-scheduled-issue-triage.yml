@@ -260,7 +260,7 @@ jobs:
                     "-e", "GCP_PROJECT",
                     "-v", "${GITHUB_WORKSPACE}:/github/workspace",
                     "-e", "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS/$GITHUB_WORKSPACE//github/workspace}",
-                    "ghcr.io/gsquared94/gemini-cli-issue-triage@sha256:e3de1523f6c83aabb3c54b76d08940a2bf42febcb789dd2da6f95169641f94d3"
+                    "ghcr.io/gsquared94/gemini-cli-issue-triage:0.0.1"
                   ],
                   "env": {
                     "GITHUB_TOKEN": "${GITHUB_TOKEN}",
