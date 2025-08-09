@@ -286,7 +286,8 @@ jobs:
                     "FIRESTORE_DATABASE_ID": "(default)",
                     "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
                   },
-                  "enabled": true
+                  "enabled": true,
+                  "timeout": 600000
                 }
               },
               "maxSessionTurns": 25,
