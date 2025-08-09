@@ -18,6 +18,7 @@ permissions:
   id-token: 'write'
   issues: 'write'
   statuses: 'write'
+  packages: 'read'
 
 jobs:
   triage-issues:
@@ -267,20 +268,14 @@ jobs:
                     "run",
                     "-i",
                     "--rm",
-                    "-e",
-                    "GITHUB_TOKEN",
-                    "-e",
-                    "GEMINI_API_KEY",
-                    "-e",
-                    "DATABASE_TYPE",
-                    "-e",
-                    "FIRESTORE_DATABASE_ID",
-                    "-e",
-                    "GCP_PROJECT",
-                    "-e",
-                    "GOOGLE_APPLICATION_CREDENTIALS",
-                    "-v",
-                    "${GOOGLE_APPLICATION_CREDENTIALS}:${GOOGLE_APPLICATION_CREDENTIALS}",
+                    "--network", "host",
+                    "-e", "GITHUB_TOKEN",
+                    "-e", "GEMINI_API_KEY",
+                    "-e", "DATABASE_TYPE",
+                    "-e", "FIRESTORE_DATABASE_ID",
+                    "-e", "GCP_PROJECT",
+                    "-e", "GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-credentials.json",
+                    "-v", "${GOOGLE_APPLICATION_CREDENTIALS}:/app/gcp-credentials.json",
                     "ghcr.io/google-gemini/gemini-cli-issue-triage@sha256:e3de1523f6c83aabb3c54b76d08940a2bf42febcb789dd2da6f95169641f94d3"
                   ],
                   "env": {
