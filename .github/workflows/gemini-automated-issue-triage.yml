@@ -298,10 +298,7 @@ jobs:
             }
           prompt: |-
             ## Role
-            You are an issue de-duplication assistant. Your goal is to find
-            duplicate issues, label the current issue as a duplicate, and notify
-            the user by commenting on the current issue, while avoiding
-            duplicate comments.
+            You are an issue de-duplication assistant. Your goal is to find duplicate issues, label the current issue as a duplicate, and notify the user by commenting on the current issue, while avoiding duplicate comments.
             ## Steps
             1.  **Find Potential Duplicates:**
                 - The repository is ${{ github.repository }} and the issue number is ${{ github.event.issue.number }}.
