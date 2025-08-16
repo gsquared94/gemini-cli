@@ -114,15 +114,15 @@ In addition to a project settings file, a project's `.gemini` directory can cont
   - **Example:** `"sandbox": "docker"`
 
 - **`toolDiscoveryCommand`** (string):
-  - **Description:** Defines a custom shell command for discovering tools from your project. The shell command must return on `stdout` a JSON array of [function declarations](https://ai.google.dev/gemini-api/docs/function-calling#function-declarations). Tool wrappers are optional.
+  - **Description:** Defines a custom shell command for discovering tools from your project. The shell command must return on `stdout` a JSON array of [function declarations](https://ai.google.dev/gemini-ap./function-calling#function-declarations). Tool wrappers are optional.
   - **Default:** Empty
   - **Example:** `"toolDiscoveryCommand": "bin/get_tools"`
 
 - **`toolCallCommand`** (string):
   - **Description:** Defines a custom shell command for calling a specific tool that was discovered using `toolDiscoveryCommand`. The shell command must meet the following criteria:
-    - It must take function `name` (exactly as in [function declaration](https://ai.google.dev/gemini-api/docs/function-calling#function-declarations)) as first command line argument.
-    - It must read function arguments as JSON on `stdin`, analogous to [`functionCall.args`](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference#functioncall).
-    - It must return function output as JSON on `stdout`, analogous to [`functionResponse.response.content`](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference#functionresponse).
+    - It must take function `name` (exactly as in [function declaration](https://ai.google.dev/gemini-ap./function-calling#function-declarations)) as first command line argument.
+    - It must read function arguments as JSON on `stdin`, analogous to [`functionCall.args`](https://cloud.google.com/vertex-ai/generative-a./model-reference/inference#functioncall).
+    - It must return function output as JSON on `stdout`, analogous to [`functionResponse.response.content`](https://cloud.google.com/vertex-ai/generative-a./model-reference/inference#functionresponse).
   - **Default:** Empty
   - **Example:** `"toolCallCommand": "bin/call_tool"`
 

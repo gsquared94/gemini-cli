@@ -38,7 +38,7 @@ If you are using a Gemini API key, you can also benefit from a free tier. This i
 - 10 model requests / user / minute
 - Model requests to Flash model only.
 
-Learn more at [Gemini API Rate Limits](https://ai.google.dev/gemini-api/docs/rate-limits).
+Learn more at [Gemini API Rate Limits](https://ai.google.dev/gemini-ap./rate-limits).
 
 ### Log in with Vertex AI (Express Mode)
 
@@ -47,7 +47,7 @@ Vertex AI offers an Express Mode without the need to enable billing. This includ
 - 90 days before you need to enable billing.
 - Quotas and models are variable and specific to your account.
 
-Learn more at [Vertex AI Express Mode Limits](https://cloud.google.com/vertex-ai/generative-ai/docs/start/express-mode/overview#quotas).
+Learn more at [Vertex AI Express Mode Limits](https://cloud.google.com/vertex-ai/generative-a./start/express-mode/overview#quotas).
 
 ## Paid tier: Higher limits for a fixed cost
 
@@ -73,13 +73,13 @@ To do this, log in using a Gemini API key or Vertex AI.
   - Quota: Governed by a dynamic shared quota system or pre-purchased provisioned throughput.
   - Cost: Based on model and token usage.
 
-Learn more at [Vertex AI Dynamic Shared Quota](https://cloud.google.com/vertex-ai/generative-ai/docs/resources/dynamic-shared-quota) and [Vertex AI Pricing](https://cloud.google.com/vertex-ai/pricing).
+Learn more at [Vertex AI Dynamic Shared Quota](https://cloud.google.com/vertex-ai/generative-a./resources/dynamic-shared-quota) and [Vertex AI Pricing](https://cloud.google.com/vertex-ai/pricing).
 
 - Gemini API key:
   - Quota: Varies by pricing tier.
   - Cost: Varies by pricing tier and model/token usage.
 
-Learn more at [Gemini API Rate Limits](https://ai.google.dev/gemini-api/docs/rate-limits), [Gemini API Pricing](https://ai.google.dev/gemini-api/docs/pricing)
+Learn more at [Gemini API Rate Limits](https://ai.google.dev/gemini-ap./rate-limits), [Gemini API Pricing](https://ai.google.dev/gemini-ap./pricing)
 
 It’s important to highlight that when using an API key, you pay per token/call. This can be more expensive for many small calls with few tokens, but it's the only way to ensure your workflow isn't interrupted by quota limits.
 

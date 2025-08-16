@@ -27,13 +27,19 @@ jobs:
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
 
       - name: 'Setup Pages'
+        id: pages
         uses: 'actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b' # ratchet:actions/configure-pages@v5
 
-      - name: 'Build with Jekyll'
-        uses: 'actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697' # ratchet:actions/jekyll-build-pages@v1
+      - name: 'Setup Ruby'
+        uses: 'ruby/setup-ruby@v1'
         with:
-          source: './'
-          destination: './_site'
+          ruby-version: '3.1'
+          bundler-cache: true
+          working-directory: './docs'
+
+      - name: 'Build with Jekyll'
+        working-directory: ./docs
+        run: bundle exec jekyll build --future --destination ../_site
 
       - name: 'Upload artifact'
         uses: 'actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa' # ratchet:actions/upload-pages-artifact@v3

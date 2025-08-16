@@ -78,7 +78,7 @@ The CLI sends data using the OTLP/gRPC protocol.
 
 Learn more about OTEL exporter standard configuration in [documentation][otel-config-docs].
 
-[otel-config-docs]: https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/
+[otel-config-docs]: https://opentelemetry.i./languages/sdk-configuration/otlp-exporter/
 
 ### Local
 

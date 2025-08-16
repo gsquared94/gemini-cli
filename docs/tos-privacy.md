@@ -18,24 +18,24 @@ For each of these four methods of authentication, different Terms of Service and
 | Authentication                | Account             | Terms of Service                                                                                        | Privacy Notice                                                                                                                                                                                   |
 | :---------------------------- | :------------------ | :------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Gemini Code Assist via Google | Individual          | [Google Terms of Service](https://policies.google.com/terms?hl=en-US)                                   | [Gemini Code Assist Privacy Notice for Individuals](https://developers.google.com/gemini-code-assist/resources/privacy-notice-gemini-code-assist-individuals)                                    |
-| Gemini Code Assist via Google | Standard/Enterprise | [Google Cloud Platform Terms of Service](https://cloud.google.com/terms)                                | [Gemini Code Assist Privacy Notice for Standard and Enterprise](https://cloud.google.com/gemini/docs/codeassist/security-privacy-compliance#standard_and_enterprise_data_protection_and_privacy) |
+| Gemini Code Assist via Google | Standard/Enterprise | [Google Cloud Platform Terms of Service](https://cloud.google.com/terms)                                | [Gemini Code Assist Privacy Notice for Standard and Enterprise](https://cloud.google.com/gemin./codeassist/security-privacy-compliance#standard_and_enterprise_data_protection_and_privacy) |
 | Gemini Developer API          | Unpaid              | [Gemini API Terms of Service - Unpaid Services](https://ai.google.dev/gemini-api/terms#unpaid-services) | [Google Privacy Policy](https://policies.google.com/privacy)                                                                                                                                     |
 | Gemini Developer API          | Paid                | [Gemini API Terms of Service - Paid Services](https://ai.google.dev/gemini-api/terms#paid-services)     | [Google Privacy Policy](https://policies.google.com/privacy)                                                                                                                                     |
 | Vertex AI Gen API             |                     | [Google Cloud Platform Service Terms](https://cloud.google.com/terms/service-terms/)                    | [Google Cloud Privacy Notice](https://cloud.google.com/terms/cloud-privacy-notice)                                                                                                               |
 
 ## 1. If you have logged in with your Google account to Gemini Code Assist for Individuals
 
-For users who use their Google account to access [Gemini Code Assist for Individuals](https://developers.google.com/gemini-code-assist/docs/overview#supported-features-gca), these Terms of Service and Privacy Notice documents apply:
+For users who use their Google account to access [Gemini Code Assist for Individuals](https://developers.google.com/gemini-code-assis./overview#supported-features-gca), these Terms of Service and Privacy Notice documents apply:
 
 - **Terms of Service:** Your use of the Gemini CLI is governed by the [Google Terms of Service](https://policies.google.com/terms?hl=en-US).
 - **Privacy Notice:** The collection and use of your data is described in the [Gemini Code Assist Privacy Notice for Individuals](https://developers.google.com/gemini-code-assist/resources/privacy-notice-gemini-code-assist-individuals).
 
 ## 2. If you have logged in with your Google account to Gemini Code Assist for Standard, or Enterprise Users
 
-For users who use their Google account to access the [Standard or Enterprise edition](https://cloud.google.com/gemini/docs/codeassist/overview#editions-overview) of Gemini Code Assist, these Terms of Service and Privacy Notice documents apply:
+For users who use their Google account to access the [Standard or Enterprise edition](https://cloud.google.com/gemin./codeassist/overview#editions-overview) of Gemini Code Assist, these Terms of Service and Privacy Notice documents apply:
 
 - **Terms of Service:** Your use of the Gemini CLI is governed by the [Google Cloud Platform Terms of Service](https://cloud.google.com/terms).
-- **Privacy Notice:** The collection and use of your data is described in the [Gemini Code Assist Privacy Notices for Standard and Enterprise Users](https://cloud.google.com/gemini/docs/codeassist/security-privacy-compliance#standard_and_enterprise_data_protection_and_privacy).
+- **Privacy Notice:** The collection and use of your data is described in the [Gemini Code Assist Privacy Notices for Standard and Enterprise Users](https://cloud.google.com/gemin./codeassist/security-privacy-compliance#standard_and_enterprise_data_protection_and_privacy).
 
 ## 3. If you have logged in with a Gemini API key to the Gemini Developer API
 
@@ -48,7 +48,7 @@ If you are using a Gemini API key for authentication with the [Gemini Developer 
 
 ## 4. If you have logged in with a Gemini API key to the Vertex AI GenAI API
 
-If you are using a Gemini API key for authentication with a [Vertex AI GenAI API](https://cloud.google.com/vertex-ai/generative-ai/docs/reference/rest) backend, these Terms of Service and Privacy Notice documents apply:
+If you are using a Gemini API key for authentication with a [Vertex AI GenAI API](https://cloud.google.com/vertex-ai/generative-a./reference/rest) backend, these Terms of Service and Privacy Notice documents apply:
 
 - **Terms of Service:** Your use of the Gemini CLI is governed by the [Google Cloud Platform Service Terms](https://cloud.google.com/terms/service-terms/).
 - **Privacy Notice:** The collection and use of your data is described in the [Google Cloud Privacy Notice](https://cloud.google.com/terms/cloud-privacy-notice).
@@ -67,7 +67,7 @@ By default (if you have not opted out):
 
 - **Google account with Gemini Code Assist for Individuals**: Yes. When you use your personal Google account, the [Gemini Code Assist Privacy Notice for Individuals](https://developers.google.com/gemini-code-assist/resources/privacy-notice-gemini-code-assist-individuals) applies. Under this notice,
   your **prompts, answers, and related code are collected** and may be used to improve Google's products, including for model training.
-- **Google account with Gemini Code Assist for Standard, or Enterprise**: No. For these accounts, your data is governed by the [Gemini Code Assist Privacy Notices](https://cloud.google.com/gemini/docs/codeassist/security-privacy-compliance#standard_and_enterprise_data_protection_and_privacy) terms, which treat your inputs as confidential. Your **prompts, answers, and related code are not collected** and are not used to train models.
+- **Google account with Gemini Code Assist for Standard, or Enterprise**: No. For these accounts, your data is governed by the [Gemini Code Assist Privacy Notices](https://cloud.google.com/gemin./codeassist/security-privacy-compliance#standard_and_enterprise_data_protection_and_privacy) terms, which treat your inputs as confidential. Your **prompts, answers, and related code are not collected** and are not used to train models.
 - **Gemini API key via the Gemini Developer API**: Whether your code is collected or used depends on whether you are using an unpaid or paid service.
   - **Unpaid services**: Yes. When you use the Gemini API key via the Gemini Developer API with an unpaid service, the [Gemini API Terms of Service - Unpaid Services](https://ai.google.dev/gemini-api/terms#unpaid-services) terms apply. Under this notice, your **prompts, answers, and related code are collected** and may be used to improve Google's products, including for model training.
   - **Paid services**: No. When you use the Gemini API key via the Gemini Developer API with a paid service, the [Gemini API Terms of Service - Paid Services](https://ai.google.dev/gemini-api/terms#paid-services) terms apply, which treats your inputs as confidential. Your **prompts, answers, and related code are not collected** and are not used to train models.

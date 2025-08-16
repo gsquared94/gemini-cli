@@ -12,7 +12,7 @@ The Gemini CLI requires you to authenticate with Google's AI services. On initia
       1. You have been assigned a license to a current Gemini Code Assist standard or enterprise subscription.
       1. You are using the product outside the [supported regions](https://developers.google.com/gemini-code-assist/resources/available-locations) for free individual usage.
       1. You are a Google account holder under the age of 18
-      - If you fall into one of these categories, you must first configure a Google Cloud Project ID to use, [enable the Gemini for Cloud API](https://cloud.google.com/gemini/docs/discover/set-up-gemini#enable-api) and [configure access permissions](https://cloud.google.com/gemini/docs/discover/set-up-gemini#grant-iam).
+      - If you fall into one of these categories, you must first configure a Google Cloud Project ID to use, [enable the Gemini for Cloud API](https://cloud.google.com/gemin./discover/set-up-gemini#enable-api) and [configure access permissions](https://cloud.google.com/gemin./discover/set-up-gemini#grant-iam).
 
       You can temporarily set the environment variable in your current shell session using the following command:
 
@@ -46,7 +46,7 @@ The Gemini CLI requires you to authenticate with Google's AI services. On initia
 
 3.  **Vertex AI:**
     - **API Key:**
-      - Obtain your Google Cloud API key: [Get an API Key](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=newuser)
+      - Obtain your Google Cloud API key: [Get an API Key](https://cloud.google.com/vertex-ai/generative-a./start/api-keys?usertype=newuser)
       - Set the `GOOGLE_API_KEY` environment variable. In the following methods, replace `YOUR_GOOGLE_API_KEY` with your Vertex AI API key:
         - You can temporarily set the environment variable in your current shell session using the following command:
           ```bash
@@ -78,10 +78,10 @@ The Gemini CLI requires you to authenticate with Google's AI services. On initia
           ```bash
           gcloud auth application-default login
           ```
-          For more information, see [Set up Application Default Credentials for Google Cloud](https://cloud.google.com/docs/authentication/provide-credentials-adc).
+          For more information, see [Set up Application Default Credentials for Google Cloud](https://cloud.google.co./authentication/provide-credentials-adc).
       - **<a id="service-account-json-key"></a>Using a Service Account (for applications or when service account API keys are restricted):**
-        - If you are unable to create an API key due to [organization policies](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=existinguser#expandable-2), or if you are running in a non-interactive environment, you can authenticate using a service account key.
-        - [Create a service account and key](https://cloud.google.com/iam/docs/keys-create-delete), and download the JSON key file. The service account will need to be assigned the "Vertex AI User" role.
+        - If you are unable to create an API key due to [organization policies](https://cloud.google.com/vertex-ai/generative-a./start/api-keys?usertype=existinguser#expandable-2), or if you are running in a non-interactive environment, you can authenticate using a service account key.
+        - [Create a service account and key](https://cloud.google.com/ia./keys-create-delete), and download the JSON key file. The service account will need to be assigned the "Vertex AI User" role.
         - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the absolute path of the JSON file.
           - You can temporarily set the environment variable in your current shell session:
             ```bash

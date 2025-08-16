@@ -11,7 +11,7 @@ Use `read_many_files` to read content from multiple files specified by paths or 
 
 `read_many_files` can be used to perform tasks such as getting an overview of a codebase, finding where specific functionality is implemented, reviewing documentation, or gathering context from multiple configuration files.
 
-**Note:** `read_many_files` looks for files following the provided paths or glob patterns. A directory path such as `"/docs"` will return an empty result; the tool requires a pattern such as `"/docs/*"` or `"/docs/*.md"` to identify the relevant files.
+**Note:** `read_many_files` looks for files following the provided paths or glob patterns. A directory path such as `"/docs"` will return an empty result; the tool requires a pattern such as `./*"` or `./*.md"` to identify the relevant files.
 
 ### Arguments
 

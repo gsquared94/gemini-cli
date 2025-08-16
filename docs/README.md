@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/npm/v/@google/gemini-cli)](https://www.npmjs.com/package/@google/gemini-cli)
 [![License](https://img.shields.io/github/license/google-gemini/gemini-cli)](https://github.com/google-gemini/gemini-cli/blob/main/LICENSE)
 
-![Gemini CLI Screenshot](./docs/assets/gemini-screenshot.png)
+![Gemini CLI Screenshot](./assets/gemini-screenshot.png)
 
 Gemini CLI is an open-source AI agent that brings the power of Gemini directly into your terminal. It provides lightweight access to Gemini, giving you the most direct path from your prompt to our model.
 
@@ -61,7 +61,7 @@ brew install gemini-cli
 
 ### Advanced Capabilities
 
-- Ground your queries with built-in [Google Search](https://ai.google.dev/gemini-api/docs/grounding) for real-time information
+- Ground your queries with built-in [Google Search](https://ai.google.dev/gemini-ap./grounding) for real-time information
 - Conversation checkpointing to save and resume complex sessions
 - Custom context files (GEMINI.md) to tailor behavior for your projects
 
@@ -80,7 +80,7 @@ Choose the authentication method that best fits your needs:
 
 ### Option 1: OAuth login (Using your Google Account)
 
-**✨ Best for:** Individual developers as well as anyone who has a Gemini Code Assist License. (see [quota limits and terms of service](https://cloud.google.com/gemini/docs/quotas) for details)
+**✨ Best for:** Individual developers as well as anyone who has a Gemini Code Assist License. (see [quota limits and terms of service](https://cloud.google.com/gemin./quotas) for details)
 
 **Benefits:**
 
@@ -136,7 +136,7 @@ export GOOGLE_GENAI_USE_VERTEXAI=true
 gemini
 ```
 
-For Google Workspace accounts and other authentication methods, see the [authentication guide](./docs/cli/authentication.md).
+For Google Workspace accounts and other authentication methods, see the [authentication guide](./cli/authentication.md).
 
 ## 🚀 Getting Started
 
@@ -187,48 +187,48 @@ gemini
 
 ### Getting Started
 
-- [**Quickstart Guide**](./docs/cli/index.md) - Get up and running quickly
-- [**Authentication Setup**](./docs/cli/authentication.md) - Detailed auth configuration
-- [**Configuration Guide**](./docs/cli/configuration.md) - Settings and customization
-- [**Keyboard Shortcuts**](./docs/keyboard-shortcuts.md) - Productivity tips
+- [**Quickstart Guide**](./cli/index.md) - Get up and running quickly
+- [**Authentication Setup**](./cli/authentication.md) - Detailed auth configuration
+- [**Configuration Guide**](./cli/configuration.md) - Settings and customization
+- [**Keyboard Shortcuts**](./keyboard-shortcuts.md) - Productivity tips
 
 ### Core Features
 
-- [**Commands Reference**](./docs/cli/commands.md) - All slash commands (`/help`, `/chat`, `/mcp`, etc.)
-- [**Checkpointing**](./docs/checkpointing.md) - Save and resume conversations
-- [**Memory Management**](./docs/tools/memory.md) - Using GEMINI.md context files
-- [**Token Caching**](./docs/cli/token-caching.md) - Optimize token usage
+- [**Commands Reference**](./cli/commands.md) - All slash commands (`/help`, `/chat`, `/mcp`, etc.)
+- [**Checkpointing**](./checkpointing.md) - Save and resume conversations
+- [**Memory Management**](./tools/memory.md) - Using GEMINI.md context files
+- [**Token Caching**](./cli/token-caching.md) - Optimize token usage
 
 ### Tools & Extensions
 
-- [**Built-in Tools Overview**](./docs/tools/index.md)
-  - [File System Operations](./docs/tools/file-system.md)
-  - [Shell Commands](./docs/tools/shell.md)
-  - [Web Fetch & Search](./docs/tools/web-fetch.md)
-  - [Multi-file Operations](./docs/tools/multi-file.md)
-- [**MCP Server Integration**](./docs/tools/mcp-server.md) - Extend with custom tools
-- [**Custom Extensions**](./docs/extension.md) - Build your own commands
+- [**Built-in Tools Overview**](./tools/index.md)
+  - [File System Operations](./tools/file-system.md)
+  - [Shell Commands](./tools/shell.md)
+  - [Web Fetch & Search](./tools/web-fetch.md)
+  - [Multi-file Operations](./tools/multi-file.md)
+- [**MCP Server Integration**](./tools/mcp-server.md) - Extend with custom tools
+- [**Custom Extensions**](./extension.md) - Build your own commands
 
 ### Advanced Topics
 
-- [**Architecture Overview**](./docs/architecture.md) - How Gemini CLI works
-- [**IDE Integration**](./docs/ide-integration.md) - VS Code companion
-- [**Sandboxing & Security**](./docs/sandbox.md) - Safe execution environments
-- [**Enterprise Deployment**](./docs/deployment.md) - Docker, system-wide config
-- [**Telemetry & Monitoring**](./docs/telemetry.md) - Usage tracking
-- [**Tools API Development**](./docs/core/tools-api.md) - Create custom tools
+- [**Architecture Overview**](./architecture.md) - How Gemini CLI works
+- [**IDE Integration**](./ide-integration.md) - VS Code companion
+- [**Sandboxing & Security**](./sandbox.md) - Safe execution environments
+- [**Enterprise Deployment**](./deployment.md) - Docker, system-wide config
+- [**Telemetry & Monitoring**](./telemetry.md) - Usage tracking
+- [**Tools API Development**](./core/tools-api.md) - Create custom tools
 
 ### Configuration & Customization
 
-- [**Settings Reference**](./docs/cli/configuration.md) - All configuration options
-- [**Theme Customization**](./docs/cli/themes.md) - Visual customization
-- [**.gemini Directory**](./docs/gemini-ignore.md) - Project-specific settings
-- [**Environment Variables**](./docs/cli/configuration.md#environment-variables)
+- [**Settings Reference**](./cli/configuration.md) - All configuration options
+- [**Theme Customization**](./cli/themes.md) - Visual customization
+- [**.gemini Directory**](./gemini-ignore.md) - Project-specific settings
+- [**Environment Variables**](./cli/configuration.md#environment-variables)
 
 ### Troubleshooting & Support
 
-- [**Troubleshooting Guide**](./docs/troubleshooting.md) - Common issues and solutions
-- [**FAQ**](./docs/troubleshooting.md#frequently-asked-questions) - Quick answers
+- [**Troubleshooting Guide**](./troubleshooting.md) - Common issues and solutions
+- [**FAQ**](./troubleshooting.md#frequently-asked-questions) - Quick answers
 - Use `/bug` command to report issues directly from the CLI
 
 ### Using MCP Servers
@@ -241,7 +241,7 @@ Configure MCP servers in `~/.gemini/settings.json` to extend Gemini CLI with cus
 > @database Run a query to find inactive users
 ```
 
-See the [MCP Server Integration guide](./docs/tools/mcp-server.md) for setup instructions.
+See the [MCP Server Integration guide](./tools/mcp-server.md) for setup instructions.
 
 ## 🤝 Contributing
 
@@ -270,7 +270,7 @@ See the [Uninstall Guide](docs/Uninstall.md) for removal instructions.
 ## 📄 Legal
 
 - **License**: [Apache License 2.0](LICENSE)
-- **Terms of Service**: [Terms & Privacy](./docs/tos-privacy.md)
+- **Terms of Service**: [Terms & Privacy](./tos-privacy.md)
 - **Security**: [Security Policy](SECURITY.md)
 
 ---
