@@ -367,7 +367,7 @@ async function loadCachedCredentials(client: OAuth2Client): Promise<boolean> {
 
       return true;
     } catch (e) {
-      console.debug(`Failed to load credentials from ${keyFile}:`, e);
+      console.debug(`Failed to load credentials from ${keyFile}:`, e instanceof Error ? { message: e.message, stack: e.stack } : e);
     }
   }
 
