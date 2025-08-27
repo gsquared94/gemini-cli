@@ -17,10 +17,18 @@ const DISABLE_BRACKETED_PASTE = '\x1b[?2004l';
  */
 export const useBracketedPaste = () => {
   const cleanup = () => {
+    // Vitest can have many workers, so we can't just write to stdout.
+    if (process.env['VITEST']) {
+      return;
+    }
     process.stdout.write(DISABLE_BRACKETED_PASTE);
   };
 
   useEffect(() => {
+    // Vitest can have many workers, so we can't just write to stdout.
+    if (process.env['VITEST']) {
+      return;
+    }
     process.stdout.write(ENABLE_BRACKETED_PASTE);
 
     process.on('exit', cleanup);

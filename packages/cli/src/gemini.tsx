@@ -384,7 +384,10 @@ export async function main() {
 }
 
 function setWindowTitle(title: string, settings: LoadedSettings) {
-  if (!settings.merged.hideWindowTitle) {
+  if (
+    !settings.merged.hideWindowTitle &&
+    process.env['TERM']?.startsWith('xterm')
+  ) {
     const windowTitle = (
       process.env['CLI_TITLE'] || `Gemini - ${title}`
     ).replace(
