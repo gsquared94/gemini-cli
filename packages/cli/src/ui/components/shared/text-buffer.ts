@@ -939,7 +939,8 @@ export type TextBufferAction =
   | { type: 'vim_move_to_first_line' }
   | { type: 'vim_move_to_last_line' }
   | { type: 'vim_move_to_line'; payload: { lineNumber: number } }
-  | { type: 'vim_escape_insert_mode' };
+  | { type: 'vim_escape_insert_mode' }
+  | { type: 'select_all' };
 
 export function textBufferReducer(
   state: TextBufferState,
@@ -1399,6 +1400,16 @@ export function textBufferReducer(
     }
 
     // Vim-specific operations
+    case 'select_all': {
+      const lastLine = state.lines.length - 1;
+      const lastChar = state.lines[lastLine].length;
+      return {
+        ...state,
+        selectionAnchor: [0, 0],
+        cursorRow: lastLine,
+        cursorCol: lastChar,
+      };
+    }
     case 'vim_delete_word_forward':
     case 'vim_delete_word_backward':
     case 'vim_delete_word_end':
@@ -1874,6 +1885,10 @@ export function useTextBuffer({
     dispatch({ type: 'move_to_offset', payload: { offset } });
   }, []);
 
+  const selectAll = useCallback((): void => {
+    dispatch({ type: 'select_all' });
+  }, []);
+
   const returnValue: TextBuffer = {
     lines,
     text,
@@ -1899,6 +1914,7 @@ export function useTextBuffer({
     moveToOffset,
     deleteWordLeft,
     deleteWordRight,
+    selectAll,
 
     killLineRight,
     killLineLeft,
@@ -1996,6 +2012,10 @@ export interface TextBuffer {
     endCol: number,
     text: string,
   ) => void;
+  /**
+   * Selects all text in the buffer.
+   */
+  selectAll: () => void;
   /**
    * Delete the word to the *left* of the caret, mirroring common
    * Ctrl/Alt+Backspace behaviour in editors & terminals. Both the adjacent

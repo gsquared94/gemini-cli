@@ -31,6 +31,8 @@ describe('keyMatchers', () => {
     [Command.CLEAR_INPUT]: (key: Key) => key.ctrl && key.name === 'c',
     [Command.DELETE_WORD_BACKWARD]: (key: Key) =>
       (key.ctrl || key.meta) && key.name === 'backspace',
+    [Command.SELECT_ALL]: (key: Key) =>
+      ((key.ctrl && key.shift) || key.meta) && key.name === 'a',
     [Command.CLEAR_SCREEN]: (key: Key) => key.ctrl && key.name === 'l',
     [Command.HISTORY_UP]: (key: Key) => key.ctrl && key.name === 'p',
     [Command.HISTORY_DOWN]: (key: Key) => key.ctrl && key.name === 'n',
@@ -122,6 +124,14 @@ describe('keyMatchers', () => {
         createKey('backspace', { meta: true }),
       ],
       negative: [createKey('backspace'), createKey('delete', { ctrl: true })],
+    },
+    {
+      command: Command.SELECT_ALL,
+      positive: [
+        createKey('a', { ctrl: true }),
+        createKey('a', { meta: true }),
+      ],
+      negative: [createKey('a'), createKey('b', { ctrl: true })],
     },
 
     // Screen control

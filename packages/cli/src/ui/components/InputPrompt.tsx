@@ -513,6 +513,10 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
         buffer.move('end');
         return;
       }
+      if (keyMatchers[Command.SELECT_ALL](key)) {
+        buffer.selectAll();
+        return;
+      }
       // Ctrl+C (Clear input)
       if (keyMatchers[Command.CLEAR_INPUT](key)) {
         if (buffer.text.length > 0) {

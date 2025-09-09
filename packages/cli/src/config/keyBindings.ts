@@ -21,6 +21,7 @@ export enum Command {
   KILL_LINE_LEFT = 'killLineLeft',
   CLEAR_INPUT = 'clearInput',
   DELETE_WORD_BACKWARD = 'deleteWordBackward',
+  SELECT_ALL = 'selectAll',
 
   // Screen control
   CLEAR_SCREEN = 'clearScreen',
@@ -104,6 +105,10 @@ export const defaultKeyBindings: KeyBindingConfig = {
   [Command.DELETE_WORD_BACKWARD]: [
     { key: 'backspace', ctrl: true },
     { key: 'backspace', command: true },
+  ],
+  [Command.SELECT_ALL]: [
+    { key: 'a', ctrl: true, shift: true },
+    { key: 'a', command: true },
   ],
 
   // Screen control
