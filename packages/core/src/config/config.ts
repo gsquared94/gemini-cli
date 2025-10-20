@@ -73,6 +73,9 @@ import { MessageBus } from '../confirmation-bus/message-bus.js';
 import { PolicyEngine } from '../policy/policy-engine.js';
 import type { PolicyEngineConfig } from '../policy/types.js';
 import type { UserTierId } from '../code_assist/types.js';
+import { ExperimentationService } from '../experimentation/experiment_service.js';
+import type { ExperimentOverrides } from '../experimentation/interfaces.js';
+
 import { AgentRegistry } from '../agents/registry.js';
 import { setGlobalProxy } from '../utils/fetch.js';
 import { SubagentToolWrapper } from '../agents/subagent-tool-wrapper.js';
@@ -392,6 +395,7 @@ export class Config {
   readonly fakeResponses?: string;
   readonly recordResponses?: string;
   private readonly disableYoloMode: boolean;
+  private experimentOverrides: ExperimentOverrides = {};
 
   constructor(params: ConfigParameters) {
     this.sessionId = params.sessionId;
@@ -599,6 +603,13 @@ export class Config {
 
     // Reset the session flag since we're explicitly changing auth and using default model
     this.inFallbackMode = false;
+
+    const experimentationService = new ExperimentationService(this);
+    await experimentationService.fetchExperiments();
+  }
+
+  applyExperimentOverrides(overrides: ExperimentOverrides) {
+    this.experimentOverrides = overrides;
   }
 
   getUserTier(): UserTierId | undefined {
@@ -638,7 +649,7 @@ export class Config {
   }
 
   getModel(): string {
-    return this.model;
+    return (this.experimentOverrides as { model?: string }).model || this.model;
   }
 
   setModel(newModel: string): void {

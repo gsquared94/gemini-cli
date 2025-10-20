@@ -136,3 +136,4 @@ export { Storage } from './config/storage.js';
 
 // Export test utils
 export * from './test-utils/index.js';
+export * from './experimentation/experiment_service.js';
