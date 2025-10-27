@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { getCodeAssistServer } from '@google/gemini-cli-core';
 import type { HistoryItemStats } from '../types.js';
 import { MessageType } from '../types.js';
 import { formatDuration } from '../utils/formatters.js';
@@ -18,7 +19,7 @@ export const statsCommand: SlashCommand = {
   altNames: ['usage'],
   description: 'Check session stats. Usage: /stats [model|tools]',
   kind: CommandKind.BUILT_IN,
-  action: (context: CommandContext) => {
+  action: async (context: CommandContext) => {
     const now = new Date();
     const { sessionStartTime } = context.session.stats;
     if (!sessionStartTime) {
@@ -37,6 +38,21 @@ export const statsCommand: SlashCommand = {
       type: MessageType.STATS,
       duration: formatDuration(wallDuration),
     };
+
+    const codeAssistServer = getCodeAssistServer(context.services.config!);
+    if (codeAssistServer && codeAssistServer.projectId) {
+      const quotaResponse = await codeAssistServer.retrieveUserQuota({
+        project: codeAssistServer.projectId,
+      });
+
+      if (quotaResponse && quotaResponse.buckets) {
+        statsItem.limits = quotaResponse.buckets.map((bucket) => ({
+          model: bucket.modelId,
+          remainingFraction: bucket.remainingFraction ?? 0,
+          resetsAt: new Date(bucket.resetTime),
+        }));
+      }
+    }
 
     context.ui.addItem(statsItem, Date.now());
   },

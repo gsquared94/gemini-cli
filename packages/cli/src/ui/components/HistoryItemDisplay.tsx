@@ -28,6 +28,7 @@ import type { SlashCommand } from '../commands/types.js';
 import { ExtensionsList } from './views/ExtensionsList.js';
 import { getMCPServerStatus } from '@google/gemini-cli-core';
 import { ToolsList } from './views/ToolsList.js';
+
 import { McpStatus } from './views/McpStatus.js';
 import { ChatList } from './views/ChatList.js';
 
@@ -109,10 +110,14 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
         <Help commands={commands} />
       )}
       {itemForDisplay.type === 'stats' && (
-        <StatsDisplay duration={itemForDisplay.duration} />
+        <StatsDisplay
+          duration={itemForDisplay.duration}
+          limits={itemForDisplay.limits}
+        />
       )}
       {itemForDisplay.type === 'model_stats' && <ModelStatsDisplay />}
       {itemForDisplay.type === 'tool_stats' && <ToolStatsDisplay />}
+
       {itemForDisplay.type === 'quit' && (
         <SessionSummaryDisplay duration={itemForDisplay.duration} />
       )}
