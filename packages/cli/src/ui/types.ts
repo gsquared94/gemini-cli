@@ -134,6 +134,7 @@ export type HistoryItemHelp = HistoryItemBase & {
 export type HistoryItemStats = HistoryItemBase & {
   type: 'stats';
   duration: string;
+  limits?: RequestLimitDetail[];
 };
 
 export type HistoryItemModelStats = HistoryItemBase & {
@@ -143,6 +144,12 @@ export type HistoryItemModelStats = HistoryItemBase & {
 export type HistoryItemToolStats = HistoryItemBase & {
   type: 'tool_stats';
 };
+
+export interface RequestLimitDetail {
+  model: string;
+  remainingFraction: number;
+  resetsAt: Date;
+}
 
 export type HistoryItemQuit = HistoryItemBase & {
   type: 'quit';
@@ -263,6 +270,7 @@ export enum MessageType {
   STATS = 'stats',
   MODEL_STATS = 'model_stats',
   TOOL_STATS = 'tool_stats',
+
   QUIT = 'quit',
   GEMINI = 'gemini',
   COMPRESSION = 'compression',

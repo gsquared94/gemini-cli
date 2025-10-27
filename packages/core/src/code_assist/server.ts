@@ -41,6 +41,11 @@ import {
   toGenerateContentRequest,
 } from './converter.js';
 
+import type {
+  RetrieveUserQuotaRequest,
+  RetrieveUserQuotaResponse,
+} from './types.js';
+
 /** HTTP options to be used in each of the requests. */
 export interface HttpOptions {
   /** Additional HTTP headers to be sent with the request. */
@@ -171,10 +176,28 @@ export class CodeAssistServer implements ContentGenerator {
     );
   }
 
+  async retrieveUserQuota(
+    req: RetrieveUserQuotaRequest,
+  ): Promise<RetrieveUserQuotaResponse> {
+    const headers: Record<string, string> = {};
+
+    const version = process.env['CLI_VERSION'] || process.version;
+    const userAgent = `GeminiCLI/${version} (${process.platform}; ${process.arch})`;
+    headers['User-Agent'] = userAgent;
+
+    return await this.requestPost<RetrieveUserQuotaResponse>(
+      'retrieveUserQuota',
+      req,
+      undefined,
+      headers,
+    );
+  }
+
   async requestPost<T>(
     method: string,
     req: object,
     signal?: AbortSignal,
+    headers?: Record<string, string>,
   ): Promise<T> {
     const res = await this.client.request({
       url: this.getMethodUrl(method),
@@ -182,6 +205,7 @@ export class CodeAssistServer implements ContentGenerator {
       headers: {
         'Content-Type': 'application/json',
         ...this.httpOptions.headers,
+        ...headers,
       },
       responseType: 'json',
       body: JSON.stringify(req),

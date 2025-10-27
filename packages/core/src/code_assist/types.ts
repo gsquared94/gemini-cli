@@ -200,3 +200,24 @@ export interface GoogleRpcResponse {
 interface GoogleRpcErrorInfo {
   reason?: string;
 }
+
+// New types for RetrieveUserQuota RPC
+export interface RetrieveUserQuotaRequest {
+  project: string; // REQUIRED: The target GCP project ID.
+}
+
+export enum TokenType {
+  TOKEN_TYPE_UNSPECIFIED = 0,
+  REQUESTS = 1, // Quota based on the number of requests.
+}
+
+export interface BucketInfo {
+  remainingFraction?: number; // The fraction of quota remaining (0.0 to 1.0).
+  resetTime: string; // The time when this quota bucket refills. (ISO 8601 string)
+  tokenType: TokenType; // The type of token tracked (e.g., REQUESTS).
+  modelId: string; // The model this quota applies to (e.g., "gemini-2.5-pro").
+}
+
+export interface RetrieveUserQuotaResponse {
+  buckets: BucketInfo[]; // A list of quota buckets for the user.
+}
