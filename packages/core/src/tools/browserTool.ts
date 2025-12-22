@@ -4,15 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  ToolResult,
-  ToolInvocation} from './tools.js';
-import {
-  BaseDeclarativeTool,
-  BaseToolInvocation,
-  Kind
-} from './tools.js';
-import { BrowserAgent } from '../sub_agents/browser/browserAgent.js';
+import type { ToolResult, ToolInvocation } from './tools.js';
+import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
+import { BrowserAgent } from '../agents/browser/browserAgent.js';
 import type { GeminiClient } from '../core/client.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 
