@@ -16,12 +16,16 @@ export class BrowserManager {
     if (!this.browser || !this.browser.isConnected()) {
       this.browser = await chromium.launch({
         headless: false,
-        channel: 'chrome', // Use actual Google Chrome
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        // channel: 'chrome', // Use actual Google Chrome
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--window-size=1024,1024',
+        ],
       });
 
       this.context = await this.browser.newContext({
-        viewport: { width: 1280, height: 800 },
+        viewport: null,
       });
 
       this.page = await this.context.newPage();
@@ -45,7 +49,7 @@ export class BrowserManager {
         // though typically they close together.
         if (this.browser) {
           this.context = await this.browser.newContext({
-            viewport: { width: 1280, height: 800 },
+            viewport: null,
           });
         }
       }

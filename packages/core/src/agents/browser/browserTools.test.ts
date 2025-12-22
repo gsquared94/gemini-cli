@@ -38,7 +38,8 @@ describe('BrowserTools', () => {
     mockPage = {
       goto: vi.fn(),
       url: vi.fn().mockReturnValue('https://example.com'),
-      viewportSize: vi.fn().mockReturnValue({ width: 1000, height: 1000 }),
+      viewportSize: vi.fn().mockReturnValue(null),
+      evaluate: vi.fn().mockResolvedValue({ width: 1000, height: 1000 }),
       mouse: mockMouse,
       keyboard: mockKeyboard,
     };
@@ -81,11 +82,55 @@ describe('BrowserTools', () => {
     });
   });
 
+  it('scroll_at should move mouse and scroll', async () => {
+    // Add move to mockMouse if not present in beforeEach (it was just click/wheel there)
+    mockMouse.move = vi.fn();
+    
+    await browserTools.scrollAt(500, 500, 0, 100);
+    
+    expect(mockMouse.move).toHaveBeenCalledWith(500, 500);
+    expect(mockMouse.wheel).toHaveBeenCalledWith(0, 100);
+  });
+
   it('scroll_document should scroll the page', async () => {
     await browserTools.scrollDocument('down', 100);
     expect(mockMouse.wheel).toHaveBeenCalledWith(0, 100);
 
     await browserTools.scrollDocument('up', 100);
     expect(mockMouse.wheel).toHaveBeenCalledWith(0, -100);
+  });
+
+  it('drag_and_drop should perform drag sequence', async () => {
+    mockMouse.move = vi.fn();
+    mockMouse.down = vi.fn();
+    mockMouse.up = vi.fn();
+
+    // 0,0 to 500,500 (scaled from 0,0 -> 500,500 on 1000x1000 viewport)
+    await browserTools.dragAndDrop(0, 0, 500, 500);
+
+    expect(mockMouse.move).toHaveBeenNthCalledWith(1, 0, 0);
+    expect(mockMouse.down).toHaveBeenCalled();
+    expect(mockMouse.move).toHaveBeenNthCalledWith(2, 500, 500);
+    expect(mockMouse.up).toHaveBeenCalled();
+  });
+
+  it('pagedown/pageup should press keys', async () => {
+    await browserTools.pagedown();
+    expect(mockKeyboard.press).toHaveBeenCalledWith('PageDown');
+
+    await browserTools.pageup();
+    expect(mockKeyboard.press).toHaveBeenCalledWith('PageUp');
+  });
+
+  it('removeOverlay should evaluate script', async () => {
+    mockPage.evaluate = vi.fn();
+    await browserTools.removeOverlay();
+    expect(mockPage.evaluate).toHaveBeenCalled();
+  });
+
+  it('updateBorderOverlay should evaluate script', async () => {
+    mockPage.evaluate = vi.fn();
+    await browserTools.updateBorderOverlay({ active: true, capturing: false });
+    expect(mockPage.evaluate).toHaveBeenCalled();
   });
 });

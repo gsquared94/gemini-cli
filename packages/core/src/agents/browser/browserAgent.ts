@@ -7,13 +7,14 @@
 import type { ContentGenerator } from '../../core/contentGenerator.js';
 import { browserTools } from './browserTools.js';
 import { browserManager } from './browserManager.js';
-import type { Content, Part } from '@google/genai';
+import type { Content, Part, Tool } from '@google/genai';
+import { Environment } from '@google/genai';
 
 // Tool Definitions for Computer Use
-const tools = [
+const tools: Tool[] = [
   {
     computerUse: {
-      environment: 'ENVIRONMENT_BROWSER',
+      environment: Environment.ENVIRONMENT_BROWSER,
     },
   },
 ];
@@ -21,35 +22,45 @@ const tools = [
 export class BrowserAgent {
   constructor(private generator: ContentGenerator) {}
 
-  async runTask(prompt: string) {
+  async runTask(prompt: string, log?: (message: string) => void) {
     const model = 'gemini-2.5-computer-use-preview-10-2025'; // Fixed model for now
-    let currentPrompt: string | Part[] = prompt;
+    
+    const systemInstruction =
+      "You are an expert browser automation agent. Your goal is to fully complete the user's task. Do not stop until the task is completely finished. If you need to perform multiple steps, continue calling tools until the objective is met.\n\nTask: ";
+    let currentPrompt: string | Part[] = systemInstruction + prompt;
 
     const contents: Content[] = [];
+    const MAX_ITERATIONS = 20;
 
-    for (let i = 0; i < 20; i++) {
+    await browserTools.updateBorderOverlay({ active: true, capturing: false });
+
+    for (let i = 0; i < MAX_ITERATIONS; i++) {
       // Capture State
       let screenshotBase64 = '';
       let domSnapshot = '';
       try {
+        await browserTools.updateBorderOverlay({ active: true, capturing: true });
         const page = await browserManager.getPage();
         const buffer = await page.screenshot();
         screenshotBase64 = buffer.toString('base64');
-        const snapshot = await page.accessibility.snapshot();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const snapshot = await (page as any).accessibility.snapshot();
         if (snapshot) {
-          domSnapshot = JSON.stringify(snapshot, null, 2).slice(0, 10000);
+          domSnapshot = JSON.stringify(snapshot, null, 2).slice(0, 1000000);
         }
       } catch (_e) {
         // Browser might not be ready
+      } finally {
+        await browserTools.updateBorderOverlay({ active: true, capturing: false });
       }
 
       const newContent: Content = { role: 'user', parts: [] };
 
       if (typeof currentPrompt === 'string') {
-        newContent.parts.push({ text: currentPrompt });
+        newContent.parts!.push({ text: currentPrompt });
       } else {
         // It's an array of parts (likely function responses)
-        newContent.parts.push(...currentPrompt);
+        newContent.parts!.push(...currentPrompt);
       }
 
       // Add Visual Grounding
@@ -60,13 +71,13 @@ export class BrowserAgent {
 
       if (!isFunctionResponse) {
         if (domSnapshot) {
-          newContent.parts.push({
+          newContent.parts!.push({
             text: `Current Accessibility Tree:
 ${domSnapshot}`,
           });
         }
         if (screenshotBase64) {
-          newContent.parts.push({
+          newContent.parts!.push({
             inlineData: {
               mimeType: 'image/png',
               data: screenshotBase64,
@@ -82,8 +93,9 @@ ${domSnapshot}`,
         {
           model,
           contents,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          tools: tools as any,
+          config: {
+            tools,
+          },
         },
         'browser-agent-session',
       );
@@ -97,6 +109,7 @@ ${domSnapshot}`,
       const functionCalls = parts.filter((p) => 'functionCall' in p);
 
       if (functionCalls.length === 0) {
+        await browserTools.removeOverlay();
         return parts.map((p) => p.text).join(''); // Finished
       }
 
@@ -104,8 +117,56 @@ ${domSnapshot}`,
       const functionResponses: Part[] = [];
       for (const part of functionCalls) {
         const call = part.functionCall!;
+        
+        if (log) {
+          let logMessage = `Executing: ${call.name}`;
+          try {
+            switch (call.name) {
+              case 'navigate':
+                logMessage = `Navigating to ${call.args!['url']}`;
+                break;
+              case 'click_at':
+                logMessage = `Clicking at ${call.args!['x']}, ${call.args!['y']}`;
+                break;
+              case 'type_text_at':
+                logMessage = `Typing "${call.args!['text']}" at ${call.args!['x']}, ${call.args!['y']}`;
+                break;
+              case 'scroll_at':
+                logMessage = `Scrolling at ${call.args!['x']}, ${call.args!['y']} by ${call.args!['delta_x']}, ${call.args!['delta_y']}`;
+                break;
+              case 'scroll_document':
+                logMessage = `Scrolling ${call.args!['direction']} by ${call.args!['amount']}`;
+                break;
+              case 'drag_and_drop':
+                logMessage = `Dragging from ${call.args!['x']}, ${call.args!['y']} to ${call.args!['dest_x']}, ${call.args!['dest_y']}`;
+                break;
+              case 'pagedown':
+                logMessage = 'Pressing PageDown';
+                break;
+              case 'pageup':
+                logMessage = 'Pressing PageUp';
+                break;
+              default:
+                // No specific log message for other tools
+                break;
+            }
+          } catch (_e) {
+            // Fallback to generic message if args access fails
+          }
+          log(logMessage);
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let funcResult: any = {};
+
+        // Check for safety decision
+        const args = call.args as {
+          safety_decision?: { decision: string; explanation: string };
+          [key: string]: unknown;
+        };
+        if (args?.safety_decision?.decision === 'require_confirmation') {
+          return `Action Required: The model requested a safety confirmation for the action "${call.name}". Please confirm if you want to proceed with: ${args.safety_decision.explanation}`;
+        }
 
         try {
           switch (call.name) {
@@ -125,13 +186,45 @@ ${domSnapshot}`,
                 call.args!['x'] as number,
                 call.args!['y'] as number,
                 call.args!['text'] as string,
+                call.args!['press_enter'] as boolean,
+                call.args!['clear_before_typing'] as boolean,
+              );
+              break;
+            case 'scroll_at':
+              funcResult = await browserTools.scrollAt(
+                call.args!['x'] as number,
+                call.args!['y'] as number,
+                (call.args!['delta_x'] as number) || 0,
+                (call.args!['delta_y'] as number) || 0,
               );
               break;
             case 'scroll_document':
               funcResult = await browserTools.scrollDocument(
-                call.args!['direction'] as 'up' | 'down',
+                call.args!['direction'] as 'up' | 'down' | 'left' | 'right',
                 call.args!['amount'] as number,
               );
+              break;
+            case 'drag_and_drop':
+              funcResult = await browserTools.dragAndDrop(
+                call.args!['x'] as number,
+                call.args!['y'] as number,
+                call.args!['dest_x'] as number,
+                call.args!['dest_y'] as number,
+              );
+              break;
+            case 'pagedown':
+              funcResult = await browserTools.pagedown();
+              break;
+            case 'pageup':
+              funcResult = await browserTools.pageup();
+              break;
+            case 'key_combination':
+              funcResult = await browserTools.keyCombination(
+                call.args!['keys'] as string,
+              );
+              break;
+            case 'open_web_browser':
+              funcResult = await browserTools.openWebBrowser();
               break;
             default:
               funcResult = { error: `Unknown tool: ${call.name}` };
@@ -141,19 +234,43 @@ ${domSnapshot}`,
           funcResult = { error: message };
         }
 
+        // Ensure URL is included in the response as required by the model
+        if (!funcResult.url) {
+          try {
+            const page = await browserManager.getPage();
+            funcResult.url = page.url();
+          } catch (_e) {
+            funcResult.url = 'about:blank';
+          }
+        }
+
+        if (log) {
+          log(`Function result for ${call.name}: ${JSON.stringify(funcResult)}`);
+        }
+
         // Capture state AFTER execution
         let newScreenshot = '';
         let newDom = '';
         try {
+          await browserTools.updateBorderOverlay({
+            active: true,
+            capturing: true,
+          });
           const page = await browserManager.getPage();
           const buffer = await page.screenshot();
           newScreenshot = buffer.toString('base64');
-          const snapshot = await page.accessibility.snapshot();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const snapshot = await (page as any).accessibility.snapshot();
           if (snapshot) {
-            newDom = JSON.stringify(snapshot, null, 2).slice(0, 10000);
+            newDom = JSON.stringify(snapshot, null, 2).slice(0, 1000000);
           }
         } catch (_e) {
           // ignore
+        } finally {
+          await browserTools.updateBorderOverlay({
+            active: true,
+            capturing: false,
+          });
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -182,5 +299,8 @@ ${newDom}`,
 
       currentPrompt = functionResponses;
     }
+    await browserTools.removeOverlay();
+    await browserTools.updateBorderOverlay({ active: false, capturing: false });
+    return `The browser agent reached the maximum number of steps (${MAX_ITERATIONS}) without completing the task. Please try refining your prompt or breaking the task into smaller steps.`;
   }
 }

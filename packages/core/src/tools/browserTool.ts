@@ -32,25 +32,22 @@ class BrowserToolInvocation extends BaseToolInvocation<
 
   async execute(
     _signal: AbortSignal,
-    _updateOutput?: (output: string) => void,
+    updateOutput?: (output: string) => void,
   ): Promise<ToolResult> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const generator = (this.client as any).getContentGeneratorOrFail();
     const agent = new BrowserAgent(generator);
 
     try {
-      const result = await agent.runTask(this.params.task);
+      const result = await agent.runTask(this.params.task, updateOutput);
       return {
-        llmContent: {
-          role: 'user',
-          parts: [{ text: result || 'Task completed' }],
-        },
+        llmContent: [{ text: result || 'Task completed' }],
         returnDisplay: result || 'Task completed',
       };
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       return {
-        llmContent: { role: 'user', parts: [{ text: `Error: ${message}` }] },
+        llmContent: [{ text: `Error: ${message}` }],
         returnDisplay: `Error: ${message}`,
         error: { message },
       };
@@ -83,7 +80,7 @@ export class BrowserTool extends BaseDeclarativeTool<
         required: ['task'],
       },
       false, // isOutputMarkdown
-      false, // canUpdateOutput
+      true, // canUpdateOutput
       messageBus,
     );
   }
