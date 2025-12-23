@@ -128,11 +128,13 @@ ${domSnapshot}`,
       const parts = response.parts || [];
 
       if (log) {
-        parts.forEach((part) => {
-          if (part.text) {
-            log(part.text);
-          }
-        });
+        const textParts = parts
+          .filter((part) => part.text)
+          .map((part) => part.text)
+          .join('\n');
+        if (textParts) {
+          log(textParts);
+        }
       }
 
       const functionCalls = parts.filter((p) => 'functionCall' in p);
@@ -146,41 +148,6 @@ ${domSnapshot}`,
       const functionResponses: Part[] = [];
       for (const part of functionCalls) {
         const call = part.functionCall!;
-
-        if (log) {
-          let logMessage = `Executing: ${call.name}`;
-          try {
-            switch (call.name) {
-              case 'navigate':
-                logMessage = `Navigating to ${call.args!['url']}`;
-                break;
-              case 'click_at':
-                logMessage = `Clicking at ${call.args!['x']}, ${call.args!['y']}`;
-                break;
-              case 'type_text_at':
-                logMessage = `Typing "${call.args!['text']}" at ${call.args!['x']}, ${call.args!['y']}`;
-                break;
-              case 'scroll_document':
-                logMessage = `Scrolling ${call.args!['direction']} by ${call.args!['amount']}`;
-                break;
-              case 'drag_and_drop':
-                logMessage = `Dragging from ${call.args!['x']}, ${call.args!['y']} to ${call.args!['dest_x']}, ${call.args!['dest_y']}`;
-                break;
-              case 'pagedown':
-                logMessage = 'Pressing PageDown';
-                break;
-              case 'pageup':
-                logMessage = 'Pressing PageUp';
-                break;
-              default:
-                // No specific log message for other tools
-                break;
-            }
-          } catch (_e) {
-            // Fallback to generic message if args access fails
-          }
-          log(logMessage);
-        }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let funcResult: any = {};
@@ -260,12 +227,6 @@ ${domSnapshot}`,
           } catch (_e) {
             funcResult.url = 'about:blank';
           }
-        }
-
-        if (log) {
-          log(
-            `Function result for ${call.name}: ${JSON.stringify(funcResult)}`,
-          );
         }
 
         // Capture state AFTER execution

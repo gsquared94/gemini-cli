@@ -13,6 +13,7 @@ export interface ToolResult {
 }
 
 export class BrowserTools {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async showOverlay(page: any, message: string): Promise<void> {
     await page.evaluate((msg: string) => {
       let overlay = document.getElementById('gemini-overlay');
@@ -106,7 +107,7 @@ export class BrowserTools {
           container.classList.remove('animate-breathing');
         }
       }, options);
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors (e.g. page closed)
     }
   }
@@ -120,11 +121,12 @@ export class BrowserTools {
           overlay.remove();
         }
       });
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors if page is closed or not available
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async moveMouse(page: any, x: number, y: number): Promise<void> {
     await page.evaluate(
       ({ x, y }: { x: number; y: number }) => {
@@ -164,7 +166,7 @@ export class BrowserTools {
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
 
-  private async showScrollIndicator(page: any, direction: string): Promise<void> {
+  private async showScrollIndicator(page: any, direction: string): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
     await page.evaluate((dir: string) => {
       let cursor = document.getElementById('gemini-cursor');
       if (!cursor) {
@@ -213,6 +215,7 @@ export class BrowserTools {
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async animateClick(page: any): Promise<void> {
     await page.evaluate(() => {
       const cursor = document.getElementById('gemini-cursor');
@@ -242,7 +245,7 @@ export class BrowserTools {
     return { output: `Navigated to ${url}`, url: page.url() };
   }
 
-  private async getViewportSize(page: any): Promise<{ width: number; height: number } | null> {
+  private async getViewportSize(page: any): Promise<{ width: number; height: number } | null> { // eslint-disable-line @typescript-eslint/no-explicit-any
     const viewport = page.viewportSize();
     if (viewport) {
       return viewport;
@@ -253,7 +256,7 @@ export class BrowserTools {
     }));
   }
 
-  private async getElementLabel(page: any, x: number, y: number): Promise<string | null> {
+  private async getElementLabel(page: any, x: number, y: number): Promise<string | null> { // eslint-disable-line @typescript-eslint/no-explicit-any
     return page.evaluate(({ x, y }: { x: number; y: number }) => {
       const el = document.elementFromPoint(x, y);
       if (!el) return null;
@@ -352,7 +355,21 @@ export class BrowserTools {
     if (direction === 'left') deltaX = -amount;
     if (direction === 'right') deltaX = amount;
 
-    await page.mouse.wheel(deltaX, deltaY);
+    // Smooth scroll implementation
+    const steps = 10;
+    const stepDelay = 30; // ms
+    const stepX = deltaX / steps;
+    const stepY = deltaY / steps;
+
+    for (let i = 0; i < steps; i++) {
+      await page.mouse.wheel(stepX, stepY);
+      // Small delay between steps to create smooth effect
+      await new Promise((resolve) => setTimeout(resolve, stepDelay));
+    }
+
+    // Wait a bit more for any inertial scrolling or rendering to settle
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
     return { output: `Scrolled ${direction} by ${amount}`, url: page.url() };
   }
 
