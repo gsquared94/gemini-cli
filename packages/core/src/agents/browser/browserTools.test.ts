@@ -63,9 +63,11 @@ describe('BrowserTools', () => {
   });
 
   it('click_at should click at scaled coordinates', async () => {
-    // x=500 (50%), y=500 (50%) of 1000x1000 viewport -> 500, 500
+    // x=500 (50%), y=500 (50%) of 1024x768 viewport -> 512, 384
     const result = await browserTools.clickAt(500, 500);
 
+    // Should call evaluate for: showCursor, getElementLabel, showOverlay, animateClick (and getViewportSize if needed)
+    expect(mockPage.evaluate).toHaveBeenCalledTimes(5); 
     expect(mockMouse.click).toHaveBeenCalledWith(500, 500);
     expect(result).toEqual({ output: 'Clicked', url: 'https://example.com' });
   });
@@ -82,18 +84,9 @@ describe('BrowserTools', () => {
     });
   });
 
-  it('scroll_at should move mouse and scroll', async () => {
-    // Add move to mockMouse if not present in beforeEach (it was just click/wheel there)
-    mockMouse.move = vi.fn();
-    
-    await browserTools.scrollAt(500, 500, 0, 100);
-    
-    expect(mockMouse.move).toHaveBeenCalledWith(500, 500);
-    expect(mockMouse.wheel).toHaveBeenCalledWith(0, 100);
-  });
-
   it('scroll_document should scroll the page', async () => {
     await browserTools.scrollDocument('down', 100);
+    expect(mockPage.evaluate).toHaveBeenCalledTimes(2);
     expect(mockMouse.wheel).toHaveBeenCalledWith(0, 100);
 
     await browserTools.scrollDocument('up', 100);

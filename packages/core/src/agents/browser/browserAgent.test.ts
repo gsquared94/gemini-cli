@@ -21,7 +21,6 @@ vi.mock('./browserTools.js', () => ({
     navigate: vi.fn(),
     clickAt: vi.fn(),
     typeTextAt: vi.fn(),
-    scrollAt: vi.fn(),
     scrollDocument: vi.fn(),
     dragAndDrop: vi.fn(),
     pagedown: vi.fn(),

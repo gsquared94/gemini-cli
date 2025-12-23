@@ -131,9 +131,6 @@ ${domSnapshot}`,
               case 'type_text_at':
                 logMessage = `Typing "${call.args!['text']}" at ${call.args!['x']}, ${call.args!['y']}`;
                 break;
-              case 'scroll_at':
-                logMessage = `Scrolling at ${call.args!['x']}, ${call.args!['y']} by ${call.args!['delta_x']}, ${call.args!['delta_y']}`;
-                break;
               case 'scroll_document':
                 logMessage = `Scrolling ${call.args!['direction']} by ${call.args!['amount']}`;
                 break;
@@ -188,14 +185,6 @@ ${domSnapshot}`,
                 call.args!['text'] as string,
                 call.args!['press_enter'] as boolean,
                 call.args!['clear_before_typing'] as boolean,
-              );
-              break;
-            case 'scroll_at':
-              funcResult = await browserTools.scrollAt(
-                call.args!['x'] as number,
-                call.args!['y'] as number,
-                (call.args!['delta_x'] as number) || 0,
-                (call.args!['delta_y'] as number) || 0,
               );
               break;
             case 'scroll_document':
