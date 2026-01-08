@@ -66,6 +66,10 @@ export class Storage {
     return path.join(Storage.getGlobalGeminiDir(), 'dependencies');
   }
 
+  static getBrowserProfileDir(): string {
+    return path.join(Storage.getGlobalGeminiDir(), 'browser-profile');
+  }
+
   static getSystemSettingsPath(): string {
     if (process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH']) {
       return process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];

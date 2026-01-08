@@ -12,14 +12,14 @@ import fs from 'node:fs';
 import { Storage } from '../../config/storage.js';
 import type { McpClient } from '../../tools/mcp-client.js';
 
-type Browser = import('playwright').Browser;
+type BrowserContext = import('playwright').BrowserContext;
 type Page = import('playwright').Page;
 
 import { getFreePort } from '../../utils/net.js';
 
 export class BrowserManager {
   private mcpClient: McpClient | undefined;
-  private browser: Browser | undefined;
+  private browserContext: BrowserContext | undefined;
   private page: Page | undefined;
   private remoteDebuggingPort: number | undefined;
 
@@ -61,7 +61,7 @@ export class BrowserManager {
     const port = this.remoteDebuggingPort;
 
     // Launch Browser via Playwright (if not running)
-    if (!this.browser || !this.browser.isConnected()) {
+    if (!this.browserContext || !this.browserContext.browser()?.isConnected()) {
       await this.launchBrowser(port, printOutput);
     }
 
@@ -96,15 +96,28 @@ export class BrowserManager {
     const settings = this.config.browserAgentSettings;
     const headless = settings?.headless ?? false;
 
-    // Launch with remote debugging for MCP to attach
+    // Get persistent profile directory
+    const userDataDir = Storage.getBrowserProfileDir();
+    debugLogger.log(`Using persistent browser profile at: ${userDataDir}`);
+
+    // Ensure the profile directory exists
+    if (!fs.existsSync(userDataDir)) {
+      fs.mkdirSync(userDataDir, { recursive: true });
+    }
+
+    // Launch with persistent context for profile persistence across runs
     // Use fixed 1024x1024 window to provide consistent viewport
     try {
-      this.browser = await chromium.launch({
-        headless,
-        handleSIGINT: false,
-        handleSIGTERM: false,
-        args: [`--remote-debugging-port=${port}`, '--window-size=1024,1024'],
-      });
+      this.browserContext = await chromium.launchPersistentContext(
+        userDataDir,
+        {
+          headless,
+          handleSIGINT: false,
+          handleSIGTERM: false,
+          args: [`--remote-debugging-port=${port}`, '--window-size=1024,1024'],
+          viewport: null, // Let window size dictate viewport
+        },
+      );
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -112,10 +125,8 @@ export class BrowserManager {
       debugLogger.error(msg);
       throw error;
     }
-    const context = await this.browser!.newContext({
-      viewport: null, // Let window size dictate viewport. Fallback handles dimension retrieval.
-    });
-    this.page = await context.newPage();
+    this.page =
+      this.browserContext!.pages()[0] || (await this.browserContext!.newPage());
 
     debugLogger.log(`Browser launched successfully on port ${port}.`);
   }
