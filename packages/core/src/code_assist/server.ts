@@ -37,7 +37,13 @@ import type {
 } from '@google/genai';
 import * as readline from 'node:readline';
 import type { ContentGenerator } from '../core/contentGenerator.js';
-import { UserTierId } from './types.js';
+import type { Config } from '../config/config.js';
+import {
+  G1_CREDIT_TYPE,
+  getG1CreditBalance,
+  shouldAutoUseCredits,
+} from '../billing/billing.js';
+import { UserTierId, type GeminiUserTier, type Credits } from './types.js';
 import type {
   CaCountTokenResponse,
   CaGenerateContentResponse,
@@ -70,12 +76,26 @@ export class CodeAssistServer implements ContentGenerator {
     readonly sessionId?: string,
     readonly userTier?: UserTierId,
     readonly userTierName?: string,
+    readonly paidTier?: GeminiUserTier,
+    readonly config?: Config,
   ) {}
 
   async generateContentStream(
     req: GenerateContentParameters,
     userPromptId: string,
   ): Promise<AsyncGenerator<GenerateContentResponse>> {
+    const shouldEnableCredits =
+      this.config &&
+      (shouldAutoUseCredits(
+        this.config.getBillingSettings().overageStrategy,
+        getG1CreditBalance(this.paidTier),
+      ) ||
+        this.config.shouldUseCreditsForNextRequest());
+
+    const enabledCreditTypes = shouldEnableCredits
+      ? ([G1_CREDIT_TYPE] as string[])
+      : undefined;
+
     const responses =
       await this.requestStreamingPost<CaGenerateContentResponse>(
         'streamGenerateContent',
@@ -84,6 +104,7 @@ export class CodeAssistServer implements ContentGenerator {
           userPromptId,
           this.projectId,
           this.sessionId,
+          enabledCreditTypes,
         ),
         req.config?.abortSignal,
       );
@@ -117,6 +138,13 @@ export class CodeAssistServer implements ContentGenerator {
           req.config?.abortSignal,
         );
 
+        if (response.consumed_credits) {
+          // Track consumed credits if needed (e.g. for telemetry)
+        }
+        if (response.remaining_credits) {
+          server.updateCredits(response.remaining_credits);
+        }
+
         yield translatedResponse;
       }
     })(this);
@@ -127,6 +155,18 @@ export class CodeAssistServer implements ContentGenerator {
     userPromptId: string,
   ): Promise<GenerateContentResponse> {
     const start = Date.now();
+    const shouldEnableCredits =
+      this.config &&
+      (shouldAutoUseCredits(
+        this.config.getBillingSettings().overageStrategy,
+        getG1CreditBalance(this.paidTier),
+      ) ||
+        this.config.shouldUseCreditsForNextRequest());
+
+    const enabledCreditTypes = shouldEnableCredits
+      ? ([G1_CREDIT_TYPE] as string[])
+      : undefined;
+
     const response = await this.requestPost<CaGenerateContentResponse>(
       'generateContent',
       toGenerateContentRequest(
@@ -134,6 +174,7 @@ export class CodeAssistServer implements ContentGenerator {
         userPromptId,
         this.projectId,
         this.sessionId,
+        enabledCreditTypes,
       ),
       req.config?.abortSignal,
     );
@@ -153,7 +194,41 @@ export class CodeAssistServer implements ContentGenerator {
       req.config?.abortSignal,
     );
 
+    if (response.remaining_credits) {
+      this.updateCredits(response.remaining_credits);
+    }
+
     return translatedResponse;
+  }
+
+  private updateCredits(remainingCredits: Credits[]): void {
+    if (!this.paidTier) {
+      return;
+    }
+
+    // Initialize availableCredits if it doesn't exist
+    if (!this.paidTier.availableCredits) {
+      this.paidTier.availableCredits = [];
+    }
+
+    for (const credit of remainingCredits) {
+      if (credit.credit_type !== G1_CREDIT_TYPE) {
+        continue;
+      }
+
+      const existingCredit = this.paidTier.availableCredits.find(
+        (c) => c.credit_type === credit.credit_type,
+      );
+
+      if (existingCredit) {
+        existingCredit.credit_amount = credit.credit_amount;
+      } else {
+        this.paidTier.availableCredits.push({
+          credit_type: credit.credit_type,
+          credit_amount: credit.credit_amount,
+        });
+      }
+    }
   }
 
   async onboardUser(
