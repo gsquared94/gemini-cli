@@ -1,0 +1,281 @@
+{
+  "description": "Represents LoadCodeAssistResponse proto json field\nhttp://google3/google/internal/cloud/code/v1internal/cloudcode.proto;l=224",
+  "type": "object",
+  "properties": {
+    "currentTier": {
+      "description": "GeminiUserTier reflects the structure received from the CodeAssist when calling LoadCodeAssist.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "UserTierId represents IDs returned from the Cloud Code Private API representing a user's tier\n\nhttp://google3/cloud/developer_experience/codeassist/shared/usertier/tiers.go\nThis is a subset of all available tiers. Since the source list is frequently updated,\nonly add a tierId here if specific client-side handling is required.",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userDefinedCloudaicompanionProject": {
+          "type": "boolean"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "privacyNotice": {
+          "description": "PrivacyNotice reflects the structure received from the CodeAssist in regards to a tier\nprivacy notice.",
+          "type": "object",
+          "properties": {
+            "showNotice": {
+              "type": "boolean"
+            },
+            "noticeText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "showNotice"
+          ]
+        },
+        "hasAcceptedTos": {
+          "type": "boolean"
+        },
+        "hasOnboardedPreviously": {
+          "type": "boolean"
+        },
+        "availableCredits": {
+          "description": "Available AI credits for this tier (e.g., Google One AI credits)",
+          "type": "array",
+          "items": {
+            "description": "Represents a credit amount for a specific credit type.\nUsed in LoadCodeAssistResponse for available credits and\nin GenerateContentResponse for consumed/remaining credits.",
+            "type": "object",
+            "properties": {
+              "credit_type": {
+                "description": "Credit types that can be used for API consumption.",
+                "enum": [
+                  "CREDIT_TYPE_UNSPECIFIED",
+                  "GOOGLE_ONE_AI"
+                ],
+                "type": "string"
+              },
+              "credit_amount": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "credit_amount",
+              "credit_type"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "allowedTiers": {
+      "type": "array",
+      "items": {
+        "description": "GeminiUserTier reflects the structure received from the CodeAssist when calling LoadCodeAssist.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "UserTierId represents IDs returned from the Cloud Code Private API representing a user's tier\n\nhttp://google3/cloud/developer_experience/codeassist/shared/usertier/tiers.go\nThis is a subset of all available tiers. Since the source list is frequently updated,\nonly add a tierId here if specific client-side handling is required.",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "userDefinedCloudaicompanionProject": {
+            "type": "boolean"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "privacyNotice": {
+            "description": "PrivacyNotice reflects the structure received from the CodeAssist in regards to a tier\nprivacy notice.",
+            "type": "object",
+            "properties": {
+              "showNotice": {
+                "type": "boolean"
+              },
+              "noticeText": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "showNotice"
+            ]
+          },
+          "hasAcceptedTos": {
+            "type": "boolean"
+          },
+          "hasOnboardedPreviously": {
+            "type": "boolean"
+          },
+          "availableCredits": {
+            "description": "Available AI credits for this tier (e.g., Google One AI credits)",
+            "type": "array",
+            "items": {
+              "description": "Represents a credit amount for a specific credit type.\nUsed in LoadCodeAssistResponse for available credits and\nin GenerateContentResponse for consumed/remaining credits.",
+              "type": "object",
+              "properties": {
+                "credit_type": {
+                  "description": "Credit types that can be used for API consumption.",
+                  "enum": [
+                    "CREDIT_TYPE_UNSPECIFIED",
+                    "GOOGLE_ONE_AI"
+                  ],
+                  "type": "string"
+                },
+                "credit_amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "credit_amount",
+                "credit_type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "ineligibleTiers": {
+      "type": "array",
+      "items": {
+        "description": "Includes information specifying the reasons for a user's ineligibility for a specific tier.",
+        "type": "object",
+        "properties": {
+          "reasonCode": {
+            "description": "List of predefined reason codes when a tier is blocked from a specific tier.\nhttps://source.corp.google.com/piper///depot/google3/google/internal/cloud/code/v1internal/cloudcode.proto;l=378",
+            "type": "string",
+            "enum": [
+              "DASHER_USER",
+              "INELIGIBLE_ACCOUNT",
+              "NON_USER_ACCOUNT",
+              "RESTRICTED_AGE",
+              "RESTRICTED_NETWORK",
+              "UNKNOWN",
+              "UNKNOWN_LOCATION",
+              "UNSUPPORTED_LOCATION",
+              "VALIDATION_REQUIRED"
+            ]
+          },
+          "reasonMessage": {
+            "type": "string"
+          },
+          "tierId": {
+            "description": "UserTierId represents IDs returned from the Cloud Code Private API representing a user's tier\n\nhttp://google3/cloud/developer_experience/codeassist/shared/usertier/tiers.go\nThis is a subset of all available tiers. Since the source list is frequently updated,\nonly add a tierId here if specific client-side handling is required.",
+            "type": "string"
+          },
+          "tierName": {
+            "type": "string"
+          },
+          "validationErrorMessage": {
+            "type": "string"
+          },
+          "validationUrl": {
+            "type": "string"
+          },
+          "validationUrlLinkText": {
+            "type": "string"
+          },
+          "validationLearnMoreUrl": {
+            "type": "string"
+          },
+          "validationLearnMoreLinkText": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reasonCode",
+          "reasonMessage",
+          "tierId",
+          "tierName"
+        ]
+      }
+    },
+    "cloudaicompanionProject": {
+      "type": "string"
+    },
+    "paidTier": {
+      "description": "GeminiUserTier reflects the structure received from the CodeAssist when calling LoadCodeAssist.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "UserTierId represents IDs returned from the Cloud Code Private API representing a user's tier\n\nhttp://google3/cloud/developer_experience/codeassist/shared/usertier/tiers.go\nThis is a subset of all available tiers. Since the source list is frequently updated,\nonly add a tierId here if specific client-side handling is required.",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userDefinedCloudaicompanionProject": {
+          "type": "boolean"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "privacyNotice": {
+          "description": "PrivacyNotice reflects the structure received from the CodeAssist in regards to a tier\nprivacy notice.",
+          "type": "object",
+          "properties": {
+            "showNotice": {
+              "type": "boolean"
+            },
+            "noticeText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "showNotice"
+          ]
+        },
+        "hasAcceptedTos": {
+          "type": "boolean"
+        },
+        "hasOnboardedPreviously": {
+          "type": "boolean"
+        },
+        "availableCredits": {
+          "description": "Available AI credits for this tier (e.g., Google One AI credits)",
+          "type": "array",
+          "items": {
+            "description": "Represents a credit amount for a specific credit type.\nUsed in LoadCodeAssistResponse for available credits and\nin GenerateContentResponse for consumed/remaining credits.",
+            "type": "object",
+            "properties": {
+              "credit_type": {
+                "description": "Credit types that can be used for API consumption.",
+                "enum": [
+                  "CREDIT_TYPE_UNSPECIFIED",
+                  "GOOGLE_ONE_AI"
+                ],
+                "type": "string"
+              },
+              "credit_amount": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "credit_amount",
+              "credit_type"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -1,0 +1,179 @@
+{
+  "POST /v1internal:listExperiments": {
+    "endpoint": "/v1internal:listExperiments",
+    "method": "POST",
+    "responses": [
+      {
+        "statusCode": 200,
+        "body": {
+          "experimentIds": []
+        }
+      }
+    ]
+  },
+  "POST /v1internal:loadCodeAssist": {
+    "endpoint": "/v1internal:loadCodeAssist",
+    "method": "POST",
+    "responses": [
+      {
+        "statusCode": 200,
+        "body": {
+          "cloudaicompanionProject": "mock-project-id",
+          "currentTier": {
+            "id": "standard-tier",
+            "name": "Standard Tier",
+            "availableCredits": []
+          },
+          "paidTier": {
+            "id": "g1-pro-tier",
+            "name": "Google One AI Premium",
+            "availableCredits": [
+              {
+                "credit_type": "GOOGLE_ONE_AI",
+                "credit_amount": "50"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "POST /v1internal:generateContent": {
+    "endpoint": "/v1internal:generateContent",
+    "method": "POST",
+    "responses": [
+      {
+        "statusCode": 200,
+        "body": {
+          "response": {
+            "candidates": [
+              {
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"reasoning\": \"Mocking router decision\", \"model_choice\": \"flash\"}"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "statusCode": 200,
+        "body": {
+          "response": {
+            "candidates": [
+              {
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"next_speaker\": \"model\"}"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "statusCode": 200,
+        "body": {
+          "response": {
+            "candidates": [
+              {
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"next_speaker\": \"model\"}"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "POST /v1internal:streamGenerateContent": {
+    "endpoint": "/v1internal:streamGenerateContent",
+    "method": "POST",
+    "responses": [
+      {
+        "statusCode": 429,
+        "body": {
+          "error": {
+            "code": 429,
+            "message": "Quota exceeded",
+            "status": "RESOURCE_EXHAUSTED",
+            "details": [
+              {
+                "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+                "reason": "QUOTA_EXHAUSTED",
+                "domain": "cloudcode-pa.googleapis.com",
+                "metadata": {
+                  "service": "cloudcode-pa.googleapis.com"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "statusCode": 200,
+        "chunks": [
+          {
+            "response": {
+              "candidates": [
+                {
+                  "content": {
+                    "parts": [
+                      {
+                        "text": "Generated with AI Credits!"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "consumed_credits": [
+                {
+                  "credit_type": "GOOGLE_ONE_AI",
+                  "credit_amount": "50"
+                }
+              ],
+              "remaining_credits": [
+                {
+                  "credit_type": "GOOGLE_ONE_AI",
+                  "credit_amount": "0"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "statusCode": 429,
+        "body": {
+          "error": {
+            "code": 429,
+            "message": "Quota exceeded (and no credits left)",
+            "status": "RESOURCE_EXHAUSTED",
+            "details": [
+              {
+                "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+                "reason": "QUOTA_EXHAUSTED",
+                "domain": "cloudcode-pa.googleapis.com",
+                "metadata": {
+                  "service": "cloudcode-pa.googleapis.com"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

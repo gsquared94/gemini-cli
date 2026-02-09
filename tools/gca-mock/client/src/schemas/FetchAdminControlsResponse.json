@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "properties": {
+    "secureModeEnabled": {
+      "type": "boolean"
+    },
+    "strictModeDisabled": {
+      "type": "boolean"
+    },
+    "mcpSetting": {
+      "type": "object",
+      "properties": {
+        "mcpEnabled": {
+          "type": "boolean"
+        },
+        "mcpConfigJson": {
+          "type": "string"
+        }
+      }
+    },
+    "cliFeatureSetting": {
+      "type": "object",
+      "properties": {
+        "extensionsSetting": {
+          "type": "object",
+          "properties": {
+            "extensionsEnabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "unmanagedCapabilitiesEnabled": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

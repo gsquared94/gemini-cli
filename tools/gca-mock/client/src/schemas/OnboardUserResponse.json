@@ -1,0 +1,22 @@
+{
+  "description": "Represents OnboardUserResponse proto\nhttp://google3/google/internal/cloud/code/v1internal/cloudcode.proto;l=215",
+  "type": "object",
+  "properties": {
+    "cloudaicompanionProject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

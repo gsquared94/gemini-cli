@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strictNullChecks": false
+  },
+  "include": [
+    "../../packages/core/src/code_assist/types.ts",
+    "../../packages/core/src/code_assist/converter.ts",
+    "../../packages/core/src/code_assist/experiments/types.ts"
+  ]
+}

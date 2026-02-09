@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@google/gemini-cli-core/*": ["../../packages/core/src/*"]
+    },
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*", "scripts/**/*", "client/**/*", "../../packages/core/src/**/*"]
+}

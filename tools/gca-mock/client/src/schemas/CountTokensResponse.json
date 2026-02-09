@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "totalTokens": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "totalTokens"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

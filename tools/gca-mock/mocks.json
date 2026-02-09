@@ -1,0 +1,27 @@
+{
+  "POST /v1internal:generateContent": {
+    "endpoint": "/v1internal:generateContent",
+    "method": "POST",
+    "currentIndex": 0,
+    "responses": [
+      {
+        "statusCode": 200,
+        "body": {
+          "response": {
+            "candidates": [
+              {
+                "content": {
+                  "parts": [
+                    {
+                      "text": "Hello from File-Based Mock!"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
